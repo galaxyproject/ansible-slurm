@@ -1,0 +1,30 @@
+##
+## This file is maintained by Ansible - CHANGES WILL BE OVERWRITTEN
+##
+
+# Authentication info
+AuthType=auth/munge
+#AuthInfo=/var/run/munge/munge.socket.2
+
+# slurmDBD info
+DbdAddr=galaxy02
+DbdHost=galaxy02
+#DbdPort=7031
+DbdPort=30001
+SlurmUser=slurm
+#MessageTimeout=300
+DebugLevel=4
+#DefaultQOS=normal,standby
+LogFile=/var/log/slurm/slurmdbd.log
+PidFile=/var/run/slurmdbd.pid
+#PluginDir=/usr/lib/slurm
+#PrivateData=accounts,users,usage,jobs
+#TrackWCKey=yes
+
+# Database info
+StorageType=accounting_storage/mysql
+#StorageHost=localhost
+#StoragePort=1234
+StoragePass={{ slurmdbd_mysql_pass }}
+StorageUser=slurm
+#StorageLoc=slurm_acct_db

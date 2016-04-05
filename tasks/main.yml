@@ -1,0 +1,155 @@
+---
+
+- name: Include OS vars
+  include_vars: "{{ ansible_os_family | lower }}.yml"
+
+- name: Install Slurm (apt)
+  apt:
+    pkg: slurm-llnl
+  when: ansible_os_family == "Debian"
+
+- name: Configure slurm yum repository
+  action:
+    module: yum_repository
+  args:
+    baseurl: "{{ slurm_yum_repo_baseurl }}"
+    description: "Galaxy Slurm repo"
+    name: galaxy_slurm
+    gpgcheck: 0
+  when: ansible_os_family == "RedHat" and slurm_yum_repo_baseurl is defined
+
+- name: Install Slurm (yum)
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - munge
+    - munge-libs
+    - slurm-plugins
+    - slurm
+    - slurm-devel
+    - slurm-munge
+    - slurm-pam_slurm
+    #- slurm-perlapi
+    - slurm-sjobexit
+    - slurm-sjstat
+    - slurm-slurmdb-direct
+    - slurm-slurmdbd
+    #- slurm-sql
+    #- slurm-torque
+  when: ansible_os_family == "RedHat"
+
+- name: Install slurm.conf
+  template:
+    src: "{{ slurm_conf_src | default( 'files/slurm/slurm.conf' ) }}"
+    dest: "{{ slurm_conf_dir }}/slurm.conf"
+    owner: root
+    group: root
+    mode: 0444
+  notify:
+    - reload slurmd
+    # FIXME: notify only for slurm controllers...
+    #- reload slurmctld
+
+- name: Install slurmdbd.conf
+  template:
+    src: slurmdbd.conf.j2
+    dest: "{{ slurm_conf_dir }}/slurmdbd.conf"
+    owner: slurm
+    group: root
+    mode: 0400
+  notify:
+    - reload slurmdbd
+  when: "'slurmdbdservers' in group_names"
+
+- name: Create slurm spool directory
+  file:
+    path: "{{ slurmd_spool_dir }}"
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+  notify:
+    - reload slurmd
+
+- name: Create slurm state directory
+  file:
+    path: "{{ slurmctld_state_dir }}"
+    owner: slurm
+    group: slurm
+    mode: 0700
+    state: directory
+  when: "'slurmservers' in group_names"
+  notify:
+    - reload slurmctld
+
+- name: Create slurm log directory
+  file:
+    path: "/var/log/{{ slurm_log_dir_name }}"
+    owner: slurm
+    group: slurm
+    mode: 0755
+    state: directory
+  when: "'slurmservers' in group_names"
+
+- name: Check munge dir
+  file:
+    path: /etc/munge
+    owner: munge
+    group: munge
+    mode: 0700
+    state: directory
+
+- name: Install munge key
+  action:
+    module: decode
+  args:
+    content: "{{ munge_key }}"
+    dest: /etc/munge/munge.key
+    filter: base64
+    owner: munge
+    group: munge
+    mode: 0400
+
+# /var/log on Ubuntu 14.04+ is group writable, which causes munge to refuse to start
+# NOTE: This is fixed in munge 0.5.12
+- name: Check /var/log permissions
+  stat:
+    path: /var/log
+  register: stat_var_log
+
+- name: Force munge to start with "insecure" /var/log permissions
+  lineinfile:
+    dest: /etc/default/munge
+    line: 'OPTIONS="--force"'
+    regexp: ^OPTIONS=
+  when: stat_var_log.stat.wgrp
+
+- name: Ensure Munge is running
+  service:
+    name: munge
+    enabled: yes
+    state: started
+
+- name: Ensure slurmd is running
+  service:
+    name: "{{ slurmd_service_name }}"
+    enabled: yes
+    state: started
+  when: "'slurmexechosts' in group_names"
+
+- name: Ensure slurmctld is running
+  service:
+    name: "{{ slurmctld_service_name }}"
+    enabled: yes
+    state: started
+  when: "'slurmservers' in group_names"
+
+- name: Ensure slurmdbd is running
+  service:
+    name: "{{ slurmdbd_service_name }}"
+    enabled: yes
+    state: started
+  when: "'slurmdbdservers' in group_names"
+
+- include: elastic.yml
+  when: "'slurmelasticservers' in group_names"

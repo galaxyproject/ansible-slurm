@@ -1,0 +1,14 @@
+---
+
+- name: Install virtualenv (yum)
+  yum:
+    pkg: python-virtualenv
+  when: ansible_os_family == "RedHat"
+
+- name: Create virtualenv for elastic components
+  pip:
+    name: "{{ item }}"
+    virtualenv: "/opt/slurm_cloud_provision"
+  with_items:
+    - shade
+    - ansible

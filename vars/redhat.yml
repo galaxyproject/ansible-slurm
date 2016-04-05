@@ -1,0 +1,9 @@
+---
+
+slurm_conf_dir: /etc/slurm
+slurm_log_dir_name: slurm
+slurmd_service_name: slurmd
+slurmctld_service_name: slurmctld
+slurmdbd_service_name: slurmdbd
+slurmd_spool_dir: /var/lib/slurm/slurmd/slurmd.spool
+slurmctld_state_dir: /var/lib/slurm/slurmctld/slurm.state
