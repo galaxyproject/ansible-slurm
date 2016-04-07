@@ -40,7 +40,7 @@
 
 - name: Install slurm.conf
   template:
-    src: "{{ slurm_conf_src | default( 'files/slurm/slurm.conf' ) }}"
+    src: "{{ slurm_conf_src | default( 'templates/slurm/slurm.conf.j2' ) }}"
     dest: "{{ slurm_conf_dir }}/slurm.conf"
     owner: root
     group: root
