@@ -47,8 +47,7 @@
     mode: 0444
   notify:
     - reload slurmd
-    # FIXME: notify only for slurm controllers...
-    #- reload slurmctld
+    - reload slurmctld
 
 - name: Install slurmdbd.conf
   template:

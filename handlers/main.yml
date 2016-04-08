@@ -1,18 +1,19 @@
 ---
 
-# FIXME: these are all broken (they need to be run only when a particular
-# service is enabled on that host
-#- name: reload slurmd
-#  service:
-#    name: "{{ slurmd_service_name }}"
-#    state: reloaded
-#
-#- name: reload slurmctld
-#  service:
-#    name: "{{ slurmctld_service_name }}"
-#    state: reloaded
-#
-#- name: reload slurmdbd
-#  service:
-#    name: "{{ slurmdbd_service_name }}"
-#    state: reloaded
+- name: reload slurmd
+  service:
+    name: "{{ slurmd_service_name }}"
+    state: reloaded
+  when: "'slurmexechosts' in group_names"
+
+- name: reload slurmctld
+  service:
+    name: "{{ slurmctld_service_name }}"
+    state: reloaded
+  when: "'slurmservers' in group_names"
+
+- name: reload slurmdbd
+  service:
+    name: "{{ slurmdbd_service_name }}"
+    state: reloaded
+  when: "'slurmdbdservers' in group_names"
