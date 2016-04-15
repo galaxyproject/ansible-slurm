@@ -6,10 +6,22 @@
     state: reloaded
   when: "'slurmexechosts' in group_names"
 
+- name: restart slurmd
+  service:
+    name: "{{ slurmd_service_name }}"
+    state: restarted
+  when: "'slurmexechosts' in group_names"
+
 - name: reload slurmctld
   service:
     name: "{{ slurmctld_service_name }}"
     state: reloaded
+  when: "'slurmservers' in group_names"
+
+- name: restart slurmctld
+  service:
+    name: "{{ slurmctld_service_name }}"
+    state: restarted
   when: "'slurmservers' in group_names"
 
 - name: reload slurmdbd

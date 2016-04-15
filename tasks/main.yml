@@ -46,8 +46,8 @@
     group: root
     mode: 0444
   notify:
-    - reload slurmd
-    - reload slurmctld
+    - restart slurmd
+    - restart slurmctld
 
 - name: Install slurmdbd.conf
   template:
