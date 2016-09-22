@@ -38,6 +38,11 @@
     #- slurm-torque
   when: ansible_os_family == "RedHat"
 
+- name: Acquire hostlist
+  command: scontrol show hostlist {{ groups[item.inventory_group] | join(",") }}
+  with_items: slurm_nodes
+  register: slurm_hostlists
+
 - name: Install slurm.conf
   template:
     src: "{{ slurm_conf_src | default( 'templates/slurm/slurm.conf.j2' ) }}"
