@@ -38,9 +38,12 @@
     #- slurm-torque
   when: ansible_os_family == "RedHat"
 
+# FIXME: this task will fail if slurmservers[0] has not already completed the slurm.conf task that follows it
 - name: Acquire hostlist
   command: scontrol show hostlist {{ groups[item.inventory_group] | join(",") }}
   with_items: slurm_nodes
+  delegate_to: "{{ groups['slurmservers'][0] }}"
+  run_once: true
   register: slurm_hostlists
 
 - name: Install slurm.conf
