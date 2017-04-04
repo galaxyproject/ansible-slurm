@@ -3,20 +3,29 @@
 - name: Include OS vars
   include_vars: "{{ ansible_os_family | lower }}.yml"
 
+- name: Create slurm group
+  group:
+    name: "{{ slurm_user.name | default('slurm') }}"
+    gid: "{{ slurm_user.gid | default(omit) }}"
+    system: "{{ slurm_user.system | default('yes') }}"
+  when: slurm_user is defined
+
+- name: Create slurm user
+  user:
+    name: "{{ slurm_user.name | default('slurm') }}"
+    comment: "{{ slurm_user.comment | default(omit) }}"
+    uid: "{{ slurm_user.uid | default(omit) }}"
+    group: "{{ slurm_user.group | default(slurm_user.name | default('slurm')) }}"
+    groups: "{{ slurm_user.groups | default(omit) }}"
+    home: "{{ slurm_user.home | default(omit) }}"
+    shell: "{{ slurm_user.shell | default(omit) }}"
+    system: "{{ slurm_user.system | default('yes') }}"
+  when: slurm_user is defined
+
 - name: Install Slurm (apt)
   apt:
     pkg: slurm-llnl
   when: ansible_os_family == "Debian"
-
-- name: Configure slurm yum repository
-  action:
-    module: yum_repository
-  args:
-    baseurl: "{{ slurm_yum_repo_baseurl }}"
-    description: "Galaxy Slurm repo"
-    name: galaxy_slurm
-    gpgcheck: 0
-  when: ansible_os_family == "RedHat" and slurm_yum_repo_baseurl is defined
 
 - name: Install Slurm (yum)
   yum:
@@ -41,7 +50,7 @@
 # FIXME: this task will fail if slurmservers[0] has not already completed the slurm.conf task that follows it
 - name: Acquire hostlist
   command: scontrol show hostlist {{ groups[item.inventory_group] | join(",") }}
-  with_items: slurm_nodes
+  with_items: "{{ slurm_nodes | default([]) }}"
   delegate_to: "{{ groups['slurmservers'][0] }}"
   run_once: true
   register: slurm_hostlists
