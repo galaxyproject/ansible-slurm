@@ -1,0 +1,35 @@
+---
+
+- name: Install Slurm controller packages (apt)
+  apt:
+    name: "{{ item }}"
+  when: ansible_os_family == "Debian"
+  with_items:
+    - slurm-wlm
+    - slurm-wlm-doc
+
+- name: Install Slurm controller packages (yum)
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - slurm
+    - slurm-munge
+  when: ansible_os_family == "RedHat"
+
+- name: Create slurm state directory
+  file:
+    path: "{{ slurmctld_state_dir }}"
+    owner: slurm
+    group: slurm
+    mode: 0700
+    state: directory
+  notify:
+    - reload slurmctld
+
+- name: Create slurm log directory
+  file:
+    path: "/var/log/{{ slurm_log_dir_name }}"
+    owner: slurm
+    group: slurm
+    mode: 0755
+    state: directory

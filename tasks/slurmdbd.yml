@@ -1,0 +1,26 @@
+---
+
+- name: Install Slurm DB packages (apt)
+  apt:
+    name: "{{ item }}"
+  when: ansible_os_family == "Debian"
+  with_items:
+    - slurmdbd
+
+- name: Install Slurm DB packages (yum)
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - munge
+    - slurm-slurmdbd
+  when: ansible_os_family == "RedHat"
+
+- name: Install slurmdbd.conf
+  template:
+    src: slurmdbd.conf.j2
+    dest: "{{ slurm_conf_dir }}/slurmdbd.conf"
+    owner: slurm
+    group: root
+    mode: 0400
+  notify:
+    - reload slurmdbd

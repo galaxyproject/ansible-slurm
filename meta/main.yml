@@ -1,0 +1,5 @@
+---
+
+dependencies:
+  - role: mariadb
+    when: "'slurmdbdservers' in group_names"

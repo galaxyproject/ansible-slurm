@@ -1,0 +1,26 @@
+---
+
+- name: Install Slurm execution host packages (apt)
+  apt:
+    name: "{{ item }}"
+  when: ansible_os_family == "Debian"
+  with_items:
+    - slurm-wlm
+
+- name: Install Slurm execution host packages (yum)
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - slurm
+    - slurm-munge
+  when: ansible_os_family == "RedHat"
+
+- name: Create slurm spool directory
+  file:
+    path: "{{ slurmd_spool_dir }}"
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+  notify:
+    - reload slurmd

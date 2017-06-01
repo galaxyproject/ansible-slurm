@@ -22,29 +22,32 @@
     system: "{{ slurm_user.system | default('yes') }}"
   when: slurm_user is defined
 
-- name: Install Slurm (apt)
+- name: Include controller installation tasks
+  include: slurmctld.yml
+  when: "'slurmservers' in group_names"
+
+- name: Include execution host installation tasks
+  include: slurmd.yml
+  when: "'slurmexechosts' in group_names"
+
+- name: Include DB installation tasks
+  include: slurmdbd.yml
+  when: "'slurmdbdservers' in group_names"
+
+- name: Install Slurm client (apt)
   apt:
-    pkg: slurm-llnl
+    name: "{{ item }}"
   when: ansible_os_family == "Debian"
+  with_items:
+    - slurm-client
+    - slurm-wlm-doc
 
 - name: Install Slurm (yum)
   yum:
     name: "{{ item }}"
   with_items:
-    - munge
-    - munge-libs
-    - slurm-plugins
     - slurm
-    - slurm-devel
     - slurm-munge
-    - slurm-pam_slurm
-    #- slurm-perlapi
-    - slurm-sjobexit
-    - slurm-sjstat
-    - slurm-slurmdb-direct
-    - slurm-slurmdbd
-    #- slurm-sql
-    #- slurm-torque
   when: ansible_os_family == "RedHat"
 
 # FIXME: this task will fail if slurmservers[0] has not already completed the slurm.conf task that follows it
@@ -65,47 +68,6 @@
   notify:
     - restart slurmd
     - restart slurmctld
-
-- name: Install slurmdbd.conf
-  template:
-    src: slurmdbd.conf.j2
-    dest: "{{ slurm_conf_dir }}/slurmdbd.conf"
-    owner: slurm
-    group: root
-    mode: 0400
-  notify:
-    - reload slurmdbd
-  when: "'slurmdbdservers' in group_names"
-
-- name: Create slurm spool directory
-  file:
-    path: "{{ slurmd_spool_dir }}"
-    owner: root
-    group: root
-    mode: 0755
-    state: directory
-  notify:
-    - reload slurmd
-
-- name: Create slurm state directory
-  file:
-    path: "{{ slurmctld_state_dir }}"
-    owner: slurm
-    group: slurm
-    mode: 0700
-    state: directory
-  when: "'slurmservers' in group_names"
-  notify:
-    - reload slurmctld
-
-- name: Create slurm log directory
-  file:
-    path: "/var/log/{{ slurm_log_dir_name }}"
-    owner: slurm
-    group: slurm
-    mode: 0755
-    state: directory
-  when: "'slurmservers' in group_names"
 
 - name: Check munge dir
   file:
@@ -132,33 +94,20 @@
   stat:
     path: /var/log
   register: stat_var_log
+  when: ansible_distribution == "Ubuntu"
 
 - name: Force munge to start with "insecure" /var/log permissions
   lineinfile:
     dest: /etc/default/munge
     line: 'OPTIONS="--force"'
     regexp: ^OPTIONS=
-  when: stat_var_log.stat.wgrp
+  when: ansible_distribution == "Ubuntu" and stat_var_log.stat.wgrp
 
 - name: Ensure Munge is running
   service:
     name: munge
     enabled: yes
     state: started
-
-- name: Ensure slurmd is running
-  service:
-    name: "{{ slurmd_service_name }}"
-    enabled: yes
-    state: started
-  when: "'slurmexechosts' in group_names"
-
-- name: Ensure slurmctld is running
-  service:
-    name: "{{ slurmctld_service_name }}"
-    enabled: yes
-    state: started
-  when: "'slurmservers' in group_names"
 
 - name: Ensure slurmdbd is running
   service:
@@ -167,5 +116,16 @@
     state: started
   when: "'slurmdbdservers' in group_names"
 
-- include: elastic.yml
-  when: "'slurmelasticservers' in group_names"
+- name: Ensure slurmctld is running
+  service:
+    name: "{{ slurmctld_service_name }}"
+    enabled: yes
+    state: started
+  when: "'slurmservers' in group_names"
+
+- name: Ensure slurmd is running
+  service:
+    name: "{{ slurmd_service_name }}"
+    enabled: yes
+    state: started
+  when: "'slurmexechosts' in group_names"
