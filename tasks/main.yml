@@ -45,6 +45,7 @@
 - name: Install Slurm (yum)
   yum:
     name: "{{ item }}"
+    state: latest
   with_items:
     - slurm
     - slurm-munge

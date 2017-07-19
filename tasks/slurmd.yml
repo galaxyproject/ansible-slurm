@@ -10,6 +10,7 @@
 - name: Install Slurm execution host packages (yum)
   yum:
     name: "{{ item }}"
+    state: latest
   with_items:
     - slurm
     - slurm-munge
