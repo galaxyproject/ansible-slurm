@@ -1,0 +1,23 @@
+##
+# Slurm Logrotate Configuration
+##
+/var/log/slurm/*.log {
+	compress
+	missingok
+	nocopytruncate
+	nocreate
+	nodelaycompress
+	nomail
+	notifempty
+	noolddir
+	rotate 5
+	sharedscripts
+	size=32M
+	create 640 slurm root
+	postrotate
+		for daemon in $(/usr/bin/scontrol show daemons)
+		do
+			killall -SIGUSR2 $daemon
+		done
+	endscript
+}

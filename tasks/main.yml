@@ -53,10 +53,16 @@
   when: ansible_os_family == "RedHat"
 
 # As of 17.11, this is only created if you install the example configs package
-- name: Create /etc/slurm (yum)
+- name: Create /etc/slurm
   file:
     path: /etc/slurm
     state: directory
+  when: ansible_os_family == "RedHat"
+
+- name: Install log rotation configuration
+  copy:
+    src: logrotate-slurm
+    dest: /etc/logrotate.d/slurm
   when: ansible_os_family == "RedHat"
 
 # FIXME: this task will fail if slurmservers[0] has not already completed the slurm.conf task that follows it

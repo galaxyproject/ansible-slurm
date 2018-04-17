@@ -27,3 +27,11 @@
     state: directory
   notify:
     - reload slurmd
+
+- name: Create slurm log directory
+  file:
+    path: "/var/log/{{ slurm_log_dir_name }}"
+    owner: slurm
+    group: slurm
+    mode: 0755
+    state: directory
