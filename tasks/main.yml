@@ -37,6 +37,7 @@
 - name: Install Slurm client (apt)
   apt:
     name: "{{ item }}"
+    state: "{{ 'latest' if slurm_upgrade else 'present' }}"
   when: ansible_os_family == "Debian"
   with_items:
     - slurm-client
@@ -45,10 +46,17 @@
 - name: Install Slurm (yum)
   yum:
     name: "{{ item }}"
-    state: latest
+    state: "{{ 'latest' if slurm_upgrade else 'present' }}"
   with_items:
     - slurm
-    - slurm-munge
+    - munge
+  when: ansible_os_family == "RedHat"
+
+# As of 17.11, this is only created if you install the example configs package
+- name: Create /etc/slurm (yum)
+  file:
+    path: /etc/slurm
+    state: directory
   when: ansible_os_family == "RedHat"
 
 # FIXME: this task will fail if slurmservers[0] has not already completed the slurm.conf task that follows it

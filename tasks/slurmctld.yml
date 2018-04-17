@@ -3,6 +3,7 @@
 - name: Install Slurm controller packages (apt)
   apt:
     name: "{{ item }}"
+    state: "{{ 'latest' if slurm_upgrade else 'present' }}"
   when: ansible_os_family == "Debian"
   with_items:
     - slurm-wlm
@@ -11,10 +12,11 @@
 - name: Install Slurm controller packages (yum)
   yum:
     name: "{{ item }}"
-    state: latest
+    state: "{{ 'latest' if slurm_upgrade else 'present' }}"
   with_items:
+    - munge
     - slurm
-    - slurm-munge
+    - slurm-slurmctld
   when: ansible_os_family == "RedHat"
 
 - name: Create slurm state directory
