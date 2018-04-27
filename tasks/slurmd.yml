@@ -35,3 +35,13 @@
     group: slurm
     mode: 0755
     state: directory
+
+- name: Create cgroup.conf
+  copy:
+    content: |
+      CgroupAutomount=yes
+      ConstrainCores=yes
+      ConstrainRAMSpace=yes
+      ConstrainSwapSpace=yes
+    dest: "{{ slurm_conf_dir }}/cgroup.conf"
+    backup: yes
