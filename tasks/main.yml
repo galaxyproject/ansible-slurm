@@ -24,15 +24,15 @@
 
 - name: Include controller installation tasks
   include: slurmctld.yml
-  when: "'slurmservers' in group_names"
+  when: "'slurmservers' in group_names or 'controller' in slurm_roles"
 
 - name: Include execution host installation tasks
   include: slurmd.yml
-  when: "'slurmexechosts' in group_names"
+  when: "'slurmexechosts' in group_names or 'exec' in slurm_roles"
 
 - name: Include DB installation tasks
   include: slurmdbd.yml
-  when: "'slurmdbdservers' in group_names"
+  when: "'slurmdbdservers' in group_names 'dbd' in slurm_roles"
 
 - name: Install Slurm client (apt)
   apt:
@@ -129,18 +129,18 @@
     name: "{{ slurmdbd_service_name }}"
     enabled: yes
     state: started
-  when: "'slurmdbdservers' in group_names"
+  when: "'slurmdbdservers' in group_names 'dbd' in slurm_roles"
 
 - name: Ensure slurmctld is running
   service:
     name: "{{ slurmctld_service_name }}"
     enabled: yes
     state: started
-  when: "'slurmservers' in group_names"
+  when: "'slurmservers' in group_names or 'controller' in slurm_roles"
 
 - name: Ensure slurmd is running
   service:
     name: "{{ slurmd_service_name }}"
     enabled: yes
     state: started
-  when: "'slurmexechosts' in group_names"
+  when: "'slurmexechosts' in group_names or 'exec' in slurm_roles"
