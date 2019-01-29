@@ -23,16 +23,16 @@
   when: slurm_user is defined
 
 - name: Include controller installation tasks
-  include: slurmctld.yml
+  include_tasks: slurmctld.yml
   when: "'slurmservers' in group_names or 'controller' in slurm_roles"
 
 - name: Include execution host installation tasks
-  include: slurmd.yml
+  include_tasks: slurmd.yml
   when: "'slurmexechosts' in group_names or 'exec' in slurm_roles"
 
 - name: Include DB installation tasks
-  include: slurmdbd.yml
-  when: "'slurmdbdservers' in group_names 'dbd' in slurm_roles"
+  include_tasks: slurmdbd.yml
+  when: "'slurmdbdservers' in group_names or 'dbd' in slurm_roles"
 
 - name: Install Slurm client (apt)
   apt:
