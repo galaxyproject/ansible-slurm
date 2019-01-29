@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: slurm
   author: The Galaxy Project
   description: Install and manage the Slurm Workload Manager
   company: The Galaxy Project
