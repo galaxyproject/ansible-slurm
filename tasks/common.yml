@@ -1,0 +1,31 @@
+---
+
+- name: Install Slurm client
+  package:
+    name: "{{ __slurm_packages.client }}"
+    state: "{{ 'latest' if slurm_upgrade else 'present' }}"
+
+- name: Include config dir creation tasks
+  include_tasks: _inc_create_config_dir.yml
+  when: slurm_create_dirs
+
+- name: Install log rotation configuration
+  template:
+    src: logrotate.j2
+    dest: /etc/logrotate.d/slurm
+  when: slurm_rotate_logs
+
+- name: Install slurm.conf
+  template:
+    src: "slurm.conf.j2"
+    dest: "{{ slurm_config_dir }}/slurm.conf"
+    owner: root
+    group: root
+    mode: 0444
+  notify:
+    - restart slurmd
+    - restart slurmctld
+
+- name: Include munge tasks
+  include_tasks: munge.yml
+  when: slurm_configure_munge

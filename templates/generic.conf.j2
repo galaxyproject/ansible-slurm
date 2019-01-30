@@ -1,0 +1,10 @@
+##
+## This file is maintained by Ansible - ALL MODIFICATIONS WILL BE REVERTED
+##
+
+{% set conf = lookup('vars', item.config) %}
+{% for key in conf | sort %}
+{% if conf[key] != None %}
+{{ key }}={{ conf[key] }}
+{% endif %}
+{% endfor %}

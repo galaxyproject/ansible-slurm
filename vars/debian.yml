@@ -1,9 +1,0 @@
----
-
-slurm_conf_dir: /etc/slurm-llnl
-# FIXME
-slurm_service_name: slurm-llnl
-slurm_log_dir_name: slurm-llnl
-slurmd_spool_dir: /var/lib/slurm-llnl/slurmd/slurmd.spool
-slurmctld_state_dir: /var/lib/slurm-llnl/slurmctld/slurm.state
-

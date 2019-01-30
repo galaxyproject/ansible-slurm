@@ -1,3 +1,89 @@
 ---
+
 slurm_upgrade: no
 slurm_roles: []
+slurm_partitions: []
+slurm_nodes: []
+
+slurm_config_dir: "{{ '/etc/slurm-llnl' if __slurm_debian else '/etc/slurm' }}"
+
+slurm_create_user: "{{ __slurm_redhat }}"
+slurm_create_dirs: "{{ __slurm_redhat }}"
+slurm_rotate_logs: "{{ __slurm_redhat }}"
+slurm_configure_munge: yes
+
+# Service names are the same on both distros since ??
+slurmd_service_name: slurmd
+slurmctld_service_name: slurmctld
+slurmdbd_service_name: slurmdbd
+
+__slurm_user_name: "{{ (slurm_user | default({})).name | default('slurm') }}"
+# TODO: this could be incorrect, use the group collection from galaxyproject.galaxy
+__slurm_group_name: "{{ (slurm_user | default({})).group | default((slurm_user | default({})).name) | default('slurm') }}"
+
+__slurm_debian: "{{ ansible_os_family == 'Debian' }}"
+__slurm_redhat: "{{ ansible_os_family == 'RedHat' }}"
+
+__slurm_config_default:
+  AuthType: auth/munge
+  CryptoType: crypto/munge
+  SlurmUser: "{{ __slurm_user_name }}"
+  ClusterName: cluster
+  # slurmctld options
+  SlurmctldPort: 6817
+  SlurmctldLogFile: "{{ '/var/log/slurm-llnl/slurmctld.log' if __slurm_debian else null }}"
+  SlurmctldPidFile: >-
+    {{
+        '/var/run/slurm-llnl/slurmctld.pid' if __slurm_debian else (
+        '/var/run/slurmctld.pid' if __slurm_redhat else
+        null)
+    }}
+  StateSaveLocation: >-
+    {{
+        '/var/lib/slurm-llnl/slurmctld' if __slurm_debian else (
+        '/var/lib/slurm/slurmctld' if __slurm_redhat else
+        null)
+    }}
+  # slurmd options
+  SlurmdPort: 6818
+  SlurmdLogFile: "{{ '/var/log/slurm-llnl/slurmd.log' if __slurm_debian else null }}"
+  SlurmdPidFile: >-
+    {{
+        '/var/run/slurm-llnl/slurmd.pid' if __slurm_debian else (
+        '/var/run/slurm.pid' if __slurm_redhat else
+        null)
+    }}
+  SlurmdSpoolDir: >-
+    {{
+        '/var/lib/slurm-llnl/slurmd' if __slurm_debian else (
+        '/var/spool/slurm/slurmd' if __slurm_redhat else
+        null)
+    }}
+__slurm_config_merged: "{{ __slurm_config_default | combine(slurm_config | default({})) }}"
+
+__slurm_debian_packages:
+  client:  [slurm-client, slurm-wlm-doc]
+  slurmctld: [slurm-wlm]
+  slurmd: [slurm-wlm]
+  slurmdbd: [slurmdbd]
+
+__slurm_redhat_packages:
+  client: [slurm, munge]
+  slurmctld: [munge, slurm, slurm-slurmctld]
+  slurmd: [munge, slurm, slurm-slurmd]
+  slurmdbd: [munge, slurm-slurmdbd]
+
+__slurm_packages: "{{ __slurm_debian_packages if __slurm_debian else __slurm_redhat_packages }}"
+
+__slurmdbd_config_default:
+  AuthType: auth/munge
+  DbdPort: 6819
+  SlurmUser: "{{ __slurm_user_name }}"
+  PidFile: >-
+    {{
+        '/var/run/slurm-llnl/slurmdbd.pid' if __slurm_debian else (
+        '/var/run/slurmdbd.pid' if __slurm_redhat else
+        null)
+    }}
+  LogFile: "{{ '/var/log/slurm-llnl/slurmdbd.log' if __slurm_debian else null }}"
+__slurmdbd_config_merged: "{{ __slurmdbd_config_default | combine(slurmdbd_config | default({})) }}"

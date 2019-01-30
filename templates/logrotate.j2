@@ -1,7 +1,8 @@
 ##
 # Slurm Logrotate Configuration
 ##
-/var/log/slurm/*.log {
+# TODO: this ignores the actual *LogFile values
+{{ '/var/log/slurm-llnl' if __slurm_debian else '/var/log/slurm' }}/*.log {
 	compress
 	missingok
 	nocopytruncate

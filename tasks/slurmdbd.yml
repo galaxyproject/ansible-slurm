@@ -1,28 +1,25 @@
 ---
 
-- name: Install Slurm DB packages (apt)
-  apt:
-    name: "{{ item }}"
+- name: Install Slurm DB packages
+  package:
+    name: "{{ __slurm_packages.slurmdbd }}"
     state: "{{ 'latest' if slurm_upgrade else 'present' }}"
-  when: ansible_os_family == "Debian"
-  with_items:
-    - slurmdbd
-
-- name: Install Slurm DB packages (yum)
-  yum:
-    name: "{{ item }}"
-    state: "{{ 'latest' if slurm_upgrade else 'present' }}"
-  with_items:
-    - munge
-    - slurm-slurmdbd
-  when: ansible_os_family == "RedHat"
 
 - name: Install slurmdbd.conf
   template:
-    src: slurmdbd.conf.j2
-    dest: "{{ slurm_conf_dir }}/slurmdbd.conf"
-    owner: slurm
+    src: generic.conf.j2
+    dest: "{{ slurm_config_dir }}/slurmdbd.conf"
+    owner: "{{ __slurm_user_name }}"
     group: root
     mode: 0400
   notify:
     - reload slurmdbd
+
+- name: Create slurm log directory
+  file:
+    path: "{{ __slurmdbd_config_merged.LogFile | dirname }}"
+    owner: "{{ __slurm_user_name }}"
+    group: "{{ __slurm_group_name }}"
+    mode: 0755
+    state: directory
+  when: slurm_create_dirs and __slurmdbd_config_merged.LogFile != None

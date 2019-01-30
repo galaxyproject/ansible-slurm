@@ -1,25 +1,7 @@
 ---
 
-- name: Include OS vars
-  include_vars: "{{ ansible_os_family | lower }}.yml"
-
-- name: Create slurm group
-  group:
-    name: "{{ slurm_user.name | default('slurm') }}"
-    gid: "{{ slurm_user.gid | default(omit) }}"
-    system: "{{ slurm_user.system | default('yes') }}"
-  when: slurm_user is defined
-
-- name: Create slurm user
-  user:
-    name: "{{ slurm_user.name | default('slurm') }}"
-    comment: "{{ slurm_user.comment | default(omit) }}"
-    uid: "{{ slurm_user.uid | default(omit) }}"
-    group: "{{ slurm_user.group | default(slurm_user.name | default('slurm')) }}"
-    groups: "{{ slurm_user.groups | default(omit) }}"
-    home: "{{ slurm_user.home | default(omit) }}"
-    shell: "{{ slurm_user.shell | default(omit) }}"
-    system: "{{ slurm_user.system | default('yes') }}"
+- name: Include user creation tasks
+  include_tasks: user.yml
   when: slurm_user is defined
 
 - name: Include controller installation tasks
@@ -34,111 +16,24 @@
   include_tasks: slurmdbd.yml
   when: "'slurmdbdservers' in group_names or 'dbd' in slurm_roles"
 
-- name: Install Slurm client (apt)
-  apt:
-    name: "{{ item }}"
-    state: "{{ 'latest' if slurm_upgrade else 'present' }}"
-  when: ansible_os_family == "Debian"
-  with_items:
-    - slurm-client
-    - slurm-wlm-doc
+- name: Import common tasks
+  import_tasks: common.yml
 
-- name: Install Slurm (yum)
-  yum:
-    name: "{{ item }}"
-    state: "{{ 'latest' if slurm_upgrade else 'present' }}"
-  with_items:
-    - slurm
-    - munge
-  when: ansible_os_family == "RedHat"
-
-# As of 17.11, this is only created if you install the example configs package
-- name: Create /etc/slurm
-  file:
-    path: /etc/slurm
-    state: directory
-  when: ansible_os_family == "RedHat"
-
-- name: Install log rotation configuration
-  copy:
-    src: logrotate-slurm
-    dest: /etc/logrotate.d/slurm
-  when: ansible_os_family == "RedHat"
-
-# FIXME: this task will fail if slurmservers[0] has not already completed the slurm.conf task that follows it
-- name: Acquire hostlist
-  command: scontrol show hostlist {{ groups[item.inventory_group] | join(",") }}
-  with_items: "{{ slurm_nodes | default([]) }}"
-  delegate_to: "{{ groups['slurmservers'][0] }}"
-  run_once: true
-  register: slurm_hostlists
-
-- name: Install slurm.conf
-  template:
-    src: "{{ slurm_conf_src | default( 'templates/slurm/slurm.conf.j2' ) }}"
-    dest: "{{ slurm_conf_dir }}/slurm.conf"
-    owner: root
-    group: root
-    mode: 0444
-  notify:
-    - restart slurmd
-    - restart slurmctld
-
-- name: Check munge dir
-  file:
-    path: /etc/munge
-    owner: munge
-    group: munge
-    mode: 0700
-    state: directory
-
-- name: Install munge key
-  action:
-    module: decode
-  args:
-    content: "{{ munge_key }}"
-    dest: /etc/munge/munge.key
-    filter: base64
-    owner: munge
-    group: munge
-    mode: 0400
-
-# /var/log on Ubuntu 14.04+ is group writable, which causes munge to refuse to start
-# NOTE: This is fixed in munge 0.5.12
-- name: Check /var/log permissions
-  stat:
-    path: /var/log
-  register: stat_var_log
-  when: ansible_distribution == "Ubuntu"
-
-- name: Force munge to start with "insecure" /var/log permissions
-  lineinfile:
-    dest: /etc/default/munge
-    line: 'OPTIONS="--force"'
-    regexp: ^OPTIONS=
-  when: ansible_distribution == "Ubuntu" and stat_var_log.stat.wgrp
-
-- name: Ensure Munge is running
-  service:
-    name: munge
-    enabled: yes
-    state: started
-
-- name: Ensure slurmdbd is running
+- name: Ensure slurmdbd is enabled and running
   service:
     name: "{{ slurmdbd_service_name }}"
     enabled: yes
     state: started
-  when: "'slurmdbdservers' in group_names 'dbd' in slurm_roles"
+  when: "'slurmdbdservers' in group_names or 'dbd' in slurm_roles"
 
-- name: Ensure slurmctld is running
+- name: Ensure slurmctld is enabled and running
   service:
     name: "{{ slurmctld_service_name }}"
     enabled: yes
     state: started
   when: "'slurmservers' in group_names or 'controller' in slurm_roles"
 
-- name: Ensure slurmd is running
+- name: Ensure slurmd is enabled and running
   service:
     name: "{{ slurmd_service_name }}"
     enabled: yes

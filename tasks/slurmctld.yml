@@ -1,38 +1,26 @@
 ---
 
-- name: Install Slurm controller packages (apt)
-  apt:
-    name: "{{ item }}"
+- name: Install Slurm controller packages
+  package:
+    name: "{{ __slurm_packages.slurmctld }}"
     state: "{{ 'latest' if slurm_upgrade else 'present' }}"
-  when: ansible_os_family == "Debian"
-  with_items:
-    - slurm-wlm
-    - slurm-wlm-doc
-
-- name: Install Slurm controller packages (yum)
-  yum:
-    name: "{{ item }}"
-    state: "{{ 'latest' if slurm_upgrade else 'present' }}"
-  with_items:
-    - munge
-    - slurm
-    - slurm-slurmctld
-  when: ansible_os_family == "RedHat"
 
 - name: Create slurm state directory
   file:
-    path: "{{ slurmctld_state_dir }}"
-    owner: slurm
-    group: slurm
+    path: "{{ __slurm_config_merged.StateSaveLocation }}"
+    owner: "{{ __slurm_user_name }}"
+    group: "{{ __slurm_group_name }}"
     mode: 0700
     state: directory
+  when: slurm_create_dirs
   notify:
     - reload slurmctld
 
 - name: Create slurm log directory
   file:
-    path: "/var/log/{{ slurm_log_dir_name }}"
-    owner: slurm
-    group: slurm
+    path: "{{ __slurm_config_merged.SlurmctldLogFile | dirname }}"
+    owner: "{{ __slurm_user_name }}"
+    group: "{{ __slurm_group_name }}"
     mode: 0755
     state: directory
+  when: slurm_create_dirs and __slurm_config_merged.SlurmctldLogFile != None

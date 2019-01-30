@@ -1,0 +1,26 @@
+##
+## This file is maintained by Ansible - ALL MODIFICATIONS WILL BE REVERTED
+##
+
+{% if 'ControlMachine' not in __slurm_config_merged and 'SlurmctldHost' not in __slurm_config_merged %}
+# Default, define SlurmctldHost or ControlMachine to override
+ControlMachine=localhost
+{% endif %}
+
+# Configuration options
+{% for key in __slurm_config_merged | sort %}
+{% if __slurm_config_merged[key] != None %}
+{{ key }}={{ __slurm_config_merged[key] }}
+{% endif %}
+{% endfor %}
+
+# Nodes
+{% for i in slurm_nodes %}
+NodeName={{ i.name }}{% for k in i %} {{ k }}={{ i[k] }}{% endfor %}
+{% endfor %}
+
+
+# Partitions
+{% for i in slurm_partitions %}
+PartitionName={{ i.name }}{% for k in i %} {{ k }}={{ i[k] }}{% endfor %}
+{% endfor %}

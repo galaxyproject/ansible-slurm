@@ -1,47 +1,40 @@
 ---
 
-- name: Install Slurm execution host packages (apt)
-  apt:
-    name: "{{ item }}"
+- name: Install Slurm execution host packages
+  package:
+    name: "{{ __slurm_packages.slurmd }}"
     state: "{{ 'latest' if slurm_upgrade else 'present' }}"
-  when: ansible_os_family == "Debian"
-  with_items:
-    - slurm-wlm
-
-- name: Install Slurm execution host packages (yum)
-  yum:
-    name: "{{ item }}"
-    state: "{{ 'latest' if slurm_upgrade else 'present' }}"
-  with_items:
-    - munge
-    - slurm
-    - slurm-slurmd
-  when: ansible_os_family == "RedHat"
 
 - name: Create slurm spool directory
   file:
-    path: "{{ slurmd_spool_dir }}"
+    path: "{{ __slurm_config_merged.SlurmdSpoolDir }}"
     owner: root
     group: root
     mode: 0755
     state: directory
+  when: slurm_create_dirs
   notify:
     - reload slurmd
 
 - name: Create slurm log directory
   file:
-    path: "/var/log/{{ slurm_log_dir_name }}"
-    owner: slurm
-    group: slurm
+    path: "{{ __slurm_config_merged.SlurmdLogFile | dirname }}"
+    owner: "{{ __slurm_user_name }}"
+    group: "{{ __slurm_group_name }}"
     mode: 0755
     state: directory
+  when: slurm_create_dirs and __slurm_config_merged.SlurmdLogFile != None
 
-- name: Create cgroup.conf
-  copy:
-    content: |
-      CgroupAutomount=yes
-      ConstrainCores=yes
-      ConstrainRAMSpace=yes
-      ConstrainSwapSpace=yes
-    dest: "{{ slurm_conf_dir }}/cgroup.conf"
+- name: Include config dir creation tasks
+  include_tasks: _inc_create_config_dir.yml
+  when: slurm_create_dirs
+
+- name: Install extra execution host configs
+  template:
+    src: generic.conf.j2
+    dest: "{{ slurm_config_dir }}/{{ item.name }}"
     backup: yes
+  with_items:
+    - name: cgroup.conf
+      config: slurm_cgroup_config
+  when: item.config in vars
