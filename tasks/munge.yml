@@ -9,30 +9,13 @@
     state: directory
 
 - name: Install munge key
-  action:
-    module: decode
-  args:
-    content: "{{ munge_key }}"
+  copy:
+    src: "{{ slurm_munge_key_src }}"
     dest: /etc/munge/munge.key
-    filter: base64
     owner: munge
     group: munge
     mode: 0400
-
-# /var/log on Ubuntu 14.04+ is group writable, which causes munge to refuse to start
-# NOTE: This is fixed in munge 0.5.12
-- name: Check /var/log permissions
-  stat:
-    path: /var/log
-  register: stat_var_log
-  when: ansible_distribution == "Ubuntu"
-
-- name: Force munge to start with "insecure" /var/log permissions
-  lineinfile:
-    dest: /etc/default/munge
-    line: 'OPTIONS="--force"'
-    regexp: ^OPTIONS=
-  when: ansible_distribution == "Ubuntu" and stat_var_log.stat.wgrp
+  when: slurm_munge_key_src is defined
 
 - name: Ensure Munge is enabled and running
   service:
