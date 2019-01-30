@@ -16,15 +16,16 @@ ControlMachine=localhost
 
 # Nodes
 {% for i in slurm_nodes %}
-NodeName={{ i.name }}{% for k in i | sort %} {{ k }}={{ i[k] }}{% endfor %}
+NodeName={{ i.name }}{% for k in i | sort if k != 'name' %} {{ k }}={{ i[k] }}{% endfor %}
+
 {% else %}
 NodeName=localhost State=UNKNOWN
 {% endfor %}
 
-
 # Partitions
 {% for i in slurm_partitions %}
-PartitionName={{ i.name }}{% for k in i | sort %} {{ k }}={{ i[k] }}{% endfor %}
+PartitionName={{ i.name }}{% for k in i | sort if k != 'name' %} {{ k }}={{ i[k] }}{% endfor %}
+
 {% else %}
-PartitionName=debug Default=YES Nodes={{ slurm_nodes[0] | default('localhost') }} State=UP
+PartitionName=debug Default=YES Nodes={{ (slurm_nodes[0] | default({})).name | default('localhost') }} State=UP
 {% endfor %}
