@@ -2,7 +2,7 @@
 
 - name: Include user creation tasks
   include_tasks: user.yml
-  when: slurm_user is defined
+  when: slurm_create_user
 
 - name: Include controller installation tasks
   include_tasks: slurmctld.yml

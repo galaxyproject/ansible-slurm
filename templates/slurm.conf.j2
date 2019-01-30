@@ -9,18 +9,22 @@ ControlMachine=localhost
 
 # Configuration options
 {% for key in __slurm_config_merged | sort %}
-{% if __slurm_config_merged[key] != None %}
+{% if __slurm_config_merged[key] %}
 {{ key }}={{ __slurm_config_merged[key] }}
 {% endif %}
 {% endfor %}
 
 # Nodes
 {% for i in slurm_nodes %}
-NodeName={{ i.name }}{% for k in i %} {{ k }}={{ i[k] }}{% endfor %}
+NodeName={{ i.name }}{% for k in i | sort %} {{ k }}={{ i[k] }}{% endfor %}
+{% else %}
+NodeName=localhost State=UNKNOWN
 {% endfor %}
 
 
 # Partitions
 {% for i in slurm_partitions %}
-PartitionName={{ i.name }}{% for k in i %} {{ k }}={{ i[k] }}{% endfor %}
+PartitionName={{ i.name }}{% for k in i | sort %} {{ k }}={{ i[k] }}{% endfor %}
+{% else %}
+PartitionName=debug Default=YES Nodes={{ slurm_nodes[0] | default('localhost') }} State=UP
 {% endfor %}

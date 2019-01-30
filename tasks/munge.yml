@@ -10,12 +10,12 @@
 
 - name: Install munge key
   copy:
-    src: "{{ slurm_munge_key_src }}"
+    src: "{{ slurm_munge_key }}"
     dest: /etc/munge/munge.key
     owner: munge
     group: munge
     mode: 0400
-  when: slurm_munge_key_src is defined
+  when: slurm_munge_key is defined
 
 - name: Ensure Munge is enabled and running
   service:

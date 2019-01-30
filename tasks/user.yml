@@ -2,17 +2,18 @@
 
 - name: Create slurm group
   group:
-    name: "{{ slurm_user.name | default('slurm') }}"
-    gid: "{{ slurm_user.gid | default(omit) }}"
-    system: "{{ slurm_user.system | default('yes') }}"
+    name: "{{ (slurm_user | default({})).group }}"
+    gid: "{{ (slurm_user | default({})).gid | default(omit) }}"
+    system: "{{ (slurm_user | default({})).system | default('yes') }}"
+  when: (slurm_user | default({})).group is defined
 
 - name: Create slurm user
   user:
-    name: "{{ slurm_user.name | default('slurm') }}"
-    comment: "{{ slurm_user.comment | default(omit) }}"
-    uid: "{{ slurm_user.uid | default(omit) }}"
-    group: "{{ slurm_user.group | default(slurm_user.name | default('slurm')) }}"
-    groups: "{{ slurm_user.groups | default(omit) }}"
-    home: "{{ slurm_user.home | default(omit) }}"
-    shell: "{{ slurm_user.shell | default(omit) }}"
-    system: "{{ slurm_user.system | default('yes') }}"
+    name: "{{ (slurm_user | default({})).name | default('slurm') }}"
+    comment: "{{ (slurm_user | default({})).comment | default(omit) }}"
+    uid: "{{ (slurm_user | default({})).uid | default(omit) }}"
+    group: "{{ (slurm_user | default({})).group | default(omit) }}"
+    groups: "{{ (slurm_user | default({})).groups | default(omit) }}"
+    home: "{{ (slurm_user | default({})).home | default(omit) }}"
+    shell: "{{ (slurm_user | default({})).shell | default(omit) }}"
+    system: "{{ (slurm_user | default({})).system | default('yes') }}"

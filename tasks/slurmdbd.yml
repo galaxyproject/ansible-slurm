@@ -22,4 +22,4 @@
     group: "{{ __slurm_group_name }}"
     mode: 0755
     state: directory
-  when: slurm_create_dirs and __slurmdbd_config_merged.LogFile != None
+  when: slurm_create_dirs and __slurmdbd_config_merged.LogFile
