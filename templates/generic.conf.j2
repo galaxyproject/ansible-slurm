@@ -4,7 +4,8 @@
 
 {% set conf = lookup('vars', item.config) %}
 {% for key in conf | sort %}
-{% if conf[key] != None %}
-{{ key }}={{ conf[key] }}
+{% set val = conf[key] %}
+{% if val is not none and val != omit %}
+{{ key }}={{ 'yes' if val is sameas true else ('no' if val is sameas false else val) }}
 {% endif %}
 {% endfor %}

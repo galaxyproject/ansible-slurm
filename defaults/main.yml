@@ -33,33 +33,29 @@ __slurm_config_default:
   ProctrackType: proctrack/pgid
   # slurmctld options
   SlurmctldPort: 6817
-  SlurmctldLogFile: "{{ '/var/log/slurm-llnl/slurmctld.log' if __slurm_debian else None }}"
+  SlurmctldLogFile: "{{ '/var/log/slurm-llnl/slurmctld.log' if __slurm_debian else omit }}"
   SlurmctldPidFile: >-
     {{
-        '/var/run/slurm-llnl/slurmctld.pid' if __slurm_debian else (
-        '/var/run/slurmctld.pid' if __slurm_redhat else
-        None)
+        '/var/run/slurm-llnl/slurmctld.pid' if __slurm_debian else omit
     }}
   StateSaveLocation: >-
     {{
         '/var/lib/slurm-llnl/slurmctld' if __slurm_debian else (
         '/var/lib/slurm/slurmctld' if __slurm_redhat else
-        None)
+        omit)
     }}
   # slurmd options
   SlurmdPort: 6818
-  SlurmdLogFile: "{{ '/var/log/slurm-llnl/slurmd.log' if __slurm_debian else None }}"
+  SlurmdLogFile: "{{ '/var/log/slurm-llnl/slurmd.log' if __slurm_debian else omit }}"
   SlurmdPidFile: >-
     {{
-        '/var/run/slurm-llnl/slurmd.pid' if __slurm_debian else (
-        '/var/run/slurm.pid' if __slurm_redhat else
-        None)
+        '/var/run/slurm-llnl/slurmd.pid' if __slurm_debian else omit
     }}
   SlurmdSpoolDir: >-
     {{
         '/var/lib/slurm-llnl/slurmd' if __slurm_debian else (
         '/var/spool/slurm/slurmd' if __slurm_redhat else
-        None)
+        omit)
     }}
 __slurm_config_merged: "{{ __slurm_config_default | combine(slurm_config | default({})) }}"
 
@@ -83,9 +79,7 @@ __slurmdbd_config_default:
   SlurmUser: "{{ __slurm_user_name }}"
   PidFile: >-
     {{
-        '/var/run/slurm-llnl/slurmdbd.pid' if __slurm_debian else (
-        '/var/run/slurmdbd.pid' if __slurm_redhat else
-        None)
+        '/var/run/slurm-llnl/slurmdbd.pid' if __slurm_debian else omit
     }}
-  LogFile: "{{ '/var/log/slurm-llnl/slurmdbd.log' if __slurm_debian else None }}"
+  LogFile: "{{ '/var/log/slurm-llnl/slurmdbd.log' if __slurm_debian else omit }}"
 __slurmdbd_config_merged: "{{ __slurmdbd_config_default | combine(slurmdbd_config | default({})) }}"
