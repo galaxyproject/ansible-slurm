@@ -6,5 +6,6 @@
 {% for gres in conf %}
 {% if gres['NodeName'] is not none %}
 NodeName={{ gres['NodeName'] }}{% for key in gres | sort %}{% if key != 'NodeName' %} {{ key }}={{ gres[key] }}{% endif %}{% endfor %}
+
 {% endif %}
 {% endfor %}
