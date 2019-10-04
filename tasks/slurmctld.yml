@@ -23,4 +23,4 @@
     group: "{{ __slurm_group_name }}"
     mode: 0755
     state: directory
-  when: slurm_create_dirs and __slurm_config_merged.SlurmctldLogFile
+  when: slurm_create_dirs and __slurm_config_merged.SlurmctldLogFile != omit
