@@ -6,7 +6,7 @@ Install and configure Slurm
 Role Variables
 --------------
 
-All variables are optional. If nothing is set, the role will install the Slurm client programs, munge, and create a `slurm.conf` with a single `localhost` node and `debug` partition. See the [defaults](defaults/main.yml) and [example playbook](#example-playbook) for examples.
+All variables are optional. If nothing is set, the role will install the Slurm client programs, munge, and create a `slurm.conf` with a single `localhost` node and `debug` partition. See the [defaults](defaults/main.yml) and [example playbooks](#example-playbooks) for examples.
 
 For the various roles a slurm node can play, you can either set group names, or add values to a list, `slurm_roles`.
 
