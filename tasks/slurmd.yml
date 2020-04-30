@@ -23,7 +23,7 @@
     group: "{{ __slurm_group_name }}"
     mode: 0755
     state: directory
-  when: slurm_create_dirs and not __slurm_config_merged.SlurmdLogFile.startswith('__omit_place_holder')
+  when: slurm_create_dirs and __slurm_config_merged.SlurmdLogFile != omit
 
 - name: Include config dir creation tasks
   include_tasks: _inc_create_config_dir.yml
