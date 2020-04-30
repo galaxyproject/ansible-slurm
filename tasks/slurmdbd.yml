@@ -27,4 +27,4 @@
     group: "{{ __slurm_group_name }}"
     mode: 0755
     state: directory
-  when: slurm_create_dirs and not __slurmdbd_config_merged.LogFile.startswith('__omit_place_holder')
+  when: slurm_create_dirs and __slurmdbd_config_merged.LogFile != omit
