@@ -1,12 +1,14 @@
 Slurm
 =====
 
-Install and configure Slurm
+Install and configure a Slurm cluster on RHEL/CentOS or Debian/Ubuntu servers
 
 Role Variables
 --------------
 
-All variables are optional. If nothing is set, the role will install the Slurm client programs, munge, and create a `slurm.conf` with a single `localhost` node and `debug` partition. See the [defaults](defaults/main.yml) and [example playbooks](#example-playbooks) for examples.
+All variables are optional. If nothing is set, the role will install the Slurm client programs, munge, and
+create a `slurm.conf` with a single `localhost` node and `debug` partition.
+See the [defaults](defaults/main.yml) and [example playbooks](#example-playbooks) for examples.
 
 For the various roles a slurm node can play, you can either set group names, or add values to a list, `slurm_roles`.
 
@@ -14,15 +16,23 @@ For the various roles a slurm node can play, you can either set group names, or 
 - group slurmexechosts or `slurm_roles: ['exec']`
 - group slurmdbdservers or `slurm_roles: ['dbd']`
 
-General config options for slurm.conf go in `slurm_config`, a hash. Keys are slurm config option names.
+General config options for slurm.conf go in `slurm_config`, a hash. Keys are Slurm config option names.
 
 Partitions and nodes go in `slurm_partitions` and `slurm_nodes`, lists of hashes. The only required key in the hash is
 `name`, which becomes the `PartitionName` or `NodeName` for that line. All other keys/values are placed on to the line
 of that partition or node.
 
-Set `slurm_upgrade` true to upgrade.
+Options for the additional configuration files [acct_gather.conf](https://slurm.schedmd.com/acct_gather.conf.html),
+[cgroup.conf](https://slurm.schedmd.com/cgroup.conf.html) and [gres.conf](https://slurm.schedmd.com/gres.conf.html)
+may be specified in the `slurm_acct_gather_config`, `slurm_cgroup_config` (both of them hashes) and
+`slurm_gres_config` (list of hashes) respectively.
 
-You can use `slurm_user` (a hash) and `slurm_create_user` (a bool) to pre-create a Slurm user (so that uids match). See
+Set `slurm_upgrade` to true to upgrade the installed Slurm packages.
+
+You can use `slurm_user` (a hash) and `slurm_create_user` (a bool) to pre-create a Slurm user so that uids match.
+
+Note that this role requires root access, so enable ``become`` either globally in your playbook / on the commandline or
+just for the role like [shown below](#example-playbooks).
 
 Dependencies
 ------------
@@ -40,7 +50,8 @@ Minimal setup, all services on one node:
   vars:
     slurm_roles: ['controller', 'exec', 'dbd']
   roles:
-    - galaxyproject.slurm
+    - role: galaxyproject.slurm
+      become: True
 ```
 
 More extensive example:
@@ -49,12 +60,12 @@ More extensive example:
 - name: Slurm execution hosts
   hosts: all
   roles:
-    - galaxyproject.slurm
+    - role: galaxyproject.slurm
+      become: True
   vars:
     slurm_cgroup_config:
       CgroupMountpoint: "/sys/fs/cgroup"
       CgroupAutomount: yes
-      CgroupReleaseAgentDir: "/etc/slurm/cgroup"
       ConstrainCores: yes
       TaskAffinity: no
       ConstrainRAMSpace: yes
@@ -68,7 +79,6 @@ More extensive example:
     slurm_config:
       AccountingStorageType: "accounting_storage/none"
       ClusterName: cluster
-      FastSchedule: 1
       GresTypes: gpu
       JobAcctGatherType: "jobacct_gather/none"
       MpiDefault: none
