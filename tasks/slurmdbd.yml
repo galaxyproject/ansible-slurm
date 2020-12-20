@@ -11,7 +11,7 @@
     dest: "{{ slurm_config_dir }}/{{ item.name }}"
     owner: "{{ __slurm_user_name }}"
     group: root
-    mode: 0400
+    mode: 0600
   with_items:
     - name: slurmdbd.conf
       config: __slurmdbd_config_merged
