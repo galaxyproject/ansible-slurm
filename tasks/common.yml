@@ -1,6 +1,7 @@
 ---
 
 - name: Install Slurm client
+  become: true
   package:
     name: "{{ __slurm_packages.client }}"
     state: "{{ 'latest' if slurm_upgrade else 'present' }}"
@@ -16,6 +17,7 @@
   when: slurm_rotate_logs
 
 - name: Install slurm.conf
+  become: true
   template:
     src: "slurm.conf.j2"
     dest: "{{ slurm_config_dir }}/slurm.conf"
@@ -25,6 +27,22 @@
   notify:
     - restart slurmd
     - restart slurmctld
+
+- name: Change ownership, group and permisssions for /var/spool
+  become: true
+  file:
+    path: /var/spool
+    owner: slurm 
+    group: slurm
+    mode: 0771
+
+- name: Change ownership, group and permisssions for /var/run/slurm
+  become: true
+  file:
+    path: /var/run/slurm
+    owner: slurm 
+    group: slurm
+    mode: 0771
 
 - name: Include munge tasks
   include_tasks: munge.yml

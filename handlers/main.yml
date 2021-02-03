@@ -5,24 +5,28 @@
     state: restarted
 
 - name: reload slurmd
+  become: yes
   service:
     name: "{{ slurmd_service_name }}"
     state: reloaded
   when: "'slurmexechosts' in group_names or 'exec' in slurm_roles"
 
 - name: restart slurmd
+  become: yes
   service:
     name: "{{ slurmd_service_name }}"
     state: restarted
   when: "'slurmexechosts' in group_names or 'exec' in slurm_roles"
 
 - name: reload slurmctld
+  become: yes
   service:
     name: "{{ slurmctld_service_name }}"
     state: reloaded
   when: "'slurmservers' in group_names or 'controller' in slurm_roles"
 
 - name: restart slurmctld
+  become: yes
   service:
     name: "{{ slurmctld_service_name }}"
     state: restarted

@@ -1,15 +1,17 @@
 ---
 
 - name: Install Slurm execution host packages
+  become: true
   package:
     name: "{{ __slurm_packages.slurmd }}"
     state: "{{ 'latest' if slurm_upgrade else 'present' }}"
 
 - name: Create slurm spool directory
+  become: yes
   file:
     path: "{{ __slurm_config_merged.SlurmdSpoolDir }}"
-    owner: root
-    group: root
+    owner: slurm
+    group: slurm
     mode: 0755
     state: directory
   when: slurm_create_dirs
@@ -17,19 +19,31 @@
     - reload slurmd
 
 - name: Create slurm log directory
+  become: yes
   file:
     path: "{{ __slurm_config_merged.SlurmdLogFile | dirname }}"
+    owner: "{{ __slurm_user_name }}"
+    group: "{{ __slurm_user_name }}"
+    mode: 0755
+    state: directory
+  when: slurm_create_dirs and __slurm_config_merged.SlurmdLogFile != omit
+
+- name: Create slurm pid directory
+  become: true
+  file:
+    path: "{{ __slurm_config_merged.SlurmdPidFile| dirname }}"
     owner: "{{ __slurm_user_name }}"
     group: "{{ __slurm_group_name }}"
     mode: 0755
     state: directory
-  when: slurm_create_dirs and __slurm_config_merged.SlurmdLogFile != omit
+  when: slurm_create_dirs and __slurm_config_merged.SlurmdPidFile != omit
 
 - name: Include config dir creation tasks
   include_tasks: _inc_create_config_dir.yml
   when: slurm_create_dirs
 
 - name: Install extra execution host configs
+  become: true
   template:
     src: "{{ item.template }}"
     dest: "{{ slurm_config_dir }}/{{ item.name }}"

@@ -1,6 +1,7 @@
 ---
 
 - name: Check munge dir
+  become: true
   file:
     path: /etc/munge
     owner: munge
@@ -20,6 +21,7 @@
     - restart munge
 
 - name: Ensure Munge is enabled and running
+  become: yes
   service:
     name: munge
     enabled: yes

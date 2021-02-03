@@ -1,0 +1,43 @@
+- name: Install MariaDB, used for SLURM accounting
+  become: true
+  package:
+    name:
+      - mariadb-server
+      - python-mysqldb
+    state: latest
+
+- name: Ensure InnoDB parameters are large enough for SLURM DBD
+  become: true
+  blockinfile:
+    path: '/etc/mysql/my.cnf'
+    state: present
+    backup: yes
+    insertafter: EOF
+    content: |
+      # See https://wiki.fysik.dtu.dk/niflheim/Slurm_database#id5
+      [mysqld]
+      innodb_buffer_pool_size=1G
+      innodb_log_file_size=64M
+      innodb_lock_wait_timeout=900
+
+- name: Ensure MariaDB daemon is up
+  become: true
+  service:
+    name: 'mariadb'
+    enabled: yes
+    state: started
+
+- name: Create DB for SLURMDBD
+  become: true
+  mysql_db:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    name: mariadb
+    state: present
+
+
+- name: Create DB user for SLURMDBD
+  become: true
+  mysql_user:
+    name: slurm 
+    password: testslurmdb
+    state: present

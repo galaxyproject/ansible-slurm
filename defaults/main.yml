@@ -32,6 +32,7 @@ __slurm_config_default:
   # default is proctrack/cgroup which is the best but also less than 100% chance of working e.g. in docker
   ProctrackType: proctrack/pgid
   # slurmctld options
+  AccountingStoragePort: 6819 
   SlurmctldPort: 6817
   SlurmctldLogFile: "{{ '/var/log/slurm-llnl/slurmctld.log' if __slurm_debian else omit }}"
   SlurmctldPidFile: >-
@@ -75,11 +76,17 @@ __slurm_packages: "{{ __slurm_debian_packages if __slurm_debian else __slurm_red
 
 __slurmdbd_config_default:
   AuthType: auth/munge
+  DbdHost: testing-slurm-slave-3
   DbdPort: 6819
   SlurmUser: "{{ __slurm_user_name }}"
   PidFile: >-
     {{
-        '/var/run/slurm-llnl/slurmdbd.pid' if __slurm_debian else omit
+        '/var/run/slurm/slurmdbd.pid' 
     }}
-  LogFile: "{{ '/var/log/slurm-llnl/slurmdbd.log' if __slurm_debian else omit }}"
+  LogFile: "{{ '/var/log/slurm/slurmdbd.log' }}"
+  StorageLoc: mariadb
+  StorageUser: slurm
+  StoragePass: testslurmdb
+  StoragePort: 3306
+  StorageType: accounting_storage/mysql
 __slurmdbd_config_merged: "{{ __slurmdbd_config_default | combine(slurmdbd_config | default({})) }}"

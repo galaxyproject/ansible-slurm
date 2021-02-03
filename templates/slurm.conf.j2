@@ -7,6 +7,8 @@
 ControlMachine=localhost
 {% endif %}
 
+
+
 # Configuration options
 {% for key in __slurm_config_merged | sort %}
 {% set val = __slurm_config_merged[key] %}
@@ -25,8 +27,7 @@ NodeName=localhost State=UNKNOWN
 
 # Partitions
 {% for i in slurm_partitions %}
-PartitionName={{ i.name }}{% for k in i | sort if k != 'name' %} {{ k }}={{ 'YES' if i[k] is sameas true else ('NO' if i[k] is sameas false else i[k]) }}{% endfor %}
+PartitionName={{ i.name }} Nodes={{ (slurm_nodes[0]).name }} Default=YES
 
-{% else %}
-PartitionName=debug Default=YES Nodes={{ (slurm_nodes[0] | default({})).name | default('localhost') }} State=UP
+
 {% endfor %}
