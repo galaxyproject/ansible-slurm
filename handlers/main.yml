@@ -3,6 +3,11 @@
   systemd:
     daemon_reload: yes
 
+- name: restart munge
+  service:
+    name: munge
+    state: restarted
+
 - name: reload slurmd
   service:
     name: "{{ slurmd_service_name }}"
