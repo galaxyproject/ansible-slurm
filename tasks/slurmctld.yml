@@ -24,3 +24,20 @@
     mode: 0755
     state: directory
   when: slurm_create_dirs and __slurm_config_merged.SlurmctldLogFile != omit
+
+- name: Directory of Pidfile must exist
+  file:
+    state: directory
+    path: "{{ __slurm_config_merged.SlurmctldPidFile | dirname }}"
+    owner: "{{ __slurm_config_merged.SlurmUser | default(omit) }}"
+  when: __slurm_config_merged.SlurmctldPidFile is defined
+
+- name: Service slurmctld , option PIDFile
+  lineinfile:
+    path: /lib/systemd/system/slurmctld.service
+    regexp: 'PIDFile'
+    line: "PIDFile={{ __slurm_config_merged.SlurmctldPidFile }}"
+  when: __slurm_config_merged.SlurmctldPidFile is defined
+  notify:
+    - systemd reload
+    - reload slurmdbd
