@@ -39,18 +39,30 @@
       config: slurm_cgroup_config
   when: item.config in vars
 
-- name: Directory of Pidfile must exist
-  file:
-    state: directory
-    path: "{{ __slurm_config_merged.SlurmdPidFile | dirname }}"
-    owner: "{{ __slurm_config_merged.SlurmUser | default(omit) }}"
-  when: __slurm_config_merged.SlurmdPidFile is defined
+- name: 'Service slurmd : Directory of Pidfile must exist and set slurm group permission'
+  lineinfile:
+    path: /lib/systemd/system/slurmd.service
+    regexp: '{{ item.regexp }}'
+    line: "{{ item.line }}"
+    insertafter: '\[Service\]'
+  loop:
+  - line : 'RuntimeDirectory={{ __slurm_config_merged.SlurmdPidFile.split("/")[-2] }}'
+    regexp : '^RuntimeDirectory'
+  - line : "Group={{ __slurm_group_name }}"
+    regexp : '^Group'
+  - line : 'RuntimeDirectoryMode=0770'
+    regexp : '^RuntimeDirectoryMode'
+  notify:
+    - systemd reload
+    - reload slurmdbd
+  when: ansible_distribution == 'Debian'
 
 - name: Service slurmctld , option PIDFile
   lineinfile:
     path: /lib/systemd/system/slurmd.service
     regexp: 'PIDFile'
     line: "PIDFile={{ __slurm_config_merged.SlurmdPidFile }}"
+    insertafter: '\[Service\]'
   when: __slurm_config_merged.SlurmdPidFile is defined
   notify:
     - systemd reload
