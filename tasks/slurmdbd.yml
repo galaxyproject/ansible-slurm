@@ -31,6 +31,7 @@
   file:
     state: directory
     path: "{{ __slurmdbd_config_merged.PidFile | dirname }}"
+    owner: "{{ __slurmdbd_config_merged.SlurmUser | default(omit) }}"
   when: __slurmdbd_config_merged.PidFile is defined
 
 - name: Service slurmdbd , option PIDFile
