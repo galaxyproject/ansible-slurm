@@ -8,10 +8,14 @@
 - name: Install slurmdbd.conf
   template:
     src: generic.conf.j2
-    dest: "{{ slurm_config_dir }}/slurmdbd.conf"
+    dest: "{{ slurm_config_dir }}/{{ item.name }}"
     owner: "{{ __slurm_user_name }}"
     group: root
     mode: 0400
+  with_items:
+    - name: slurmdbd.conf
+      config: slurmdbd_config
+  when: item.config in vars
   notify:
     - reload slurmdbd
 
