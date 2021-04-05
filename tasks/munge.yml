@@ -16,6 +16,7 @@
     group: munge
     mode: 0400
   when: slurm_munge_key is defined
+  notify: restart munge
 
 - name: Ensure Munge is enabled and running
   service:
