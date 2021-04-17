@@ -24,3 +24,32 @@
     mode: 0755
     state: directory
   when: slurm_create_dirs and __slurm_config_merged.SlurmctldLogFile != omit
+
+- name: 'Service slurmctld : Directory of Pidfile must exist and set slurm group permission'
+  lineinfile:
+    path: /lib/systemd/system/slurmctld.service
+    regexp: '{{ item.regexp }}'
+    line: "{{ item.line }}"
+    insertafter: '\[Service\]'
+  loop:
+  - line : 'RuntimeDirectory={{ __slurm_config_merged.SlurmctldPidFile.split("/")[-2] }}'
+    regexp : '^RuntimeDirectory'
+  - line : "Group={{ __slurm_group_name }}"
+    regexp : '^Group'
+  - line : 'RuntimeDirectoryMode=0770'
+    regexp : '^RuntimeDirectoryMode'
+  notify:
+    - systemd reload
+    - reload slurmdbd
+  when: ansible_distribution == 'Debian'
+
+- name: Service slurmctld , option PIDFile
+  lineinfile:
+    path: /lib/systemd/system/slurmctld.service
+    regexp: 'PIDFile'
+    line: "PIDFile={{ __slurm_config_merged.SlurmctldPidFile }}"
+    insertafter: '\[Service\]'
+  when: __slurm_config_merged.SlurmctldPidFile is defined
+  notify:
+    - systemd reload
+    - reload slurmdbd

@@ -1,4 +1,7 @@
 ---
+- name: systemd reload
+  systemd:
+    daemon_reload: yes
 
 - name: reload slurmd
   service:
