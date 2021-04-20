@@ -1,0 +1,20 @@
+---
+
+- name: Check for existence of cluster in db.
+  register: cluster_check
+  shell: "sacctmgr -n list cluster | cut -f 4 -d ' '"
+  become: yes
+  become_user: root
+
+- name: set cluster_check_boolean
+  set_fact:
+      __cluster_not_setup: false
+  when: cluster_check.stdout == "cluster"
+
+- name: Create the slurmdbd cluster
+  command: sacctmgr -i -n add cluster {{ __slurm_cluster_name }}
+  become: yes
+  become_user: root
+  notify:
+    - reload slurmdbd
+  when: __cluster_not_setup
