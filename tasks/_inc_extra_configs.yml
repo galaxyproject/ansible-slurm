@@ -4,8 +4,9 @@
   template:
     src: "{{ item.template }}"
     dest: "{{ slurm_config_dir }}/{{ item.name }}"
-    backup: yes
-  with_items:
+    mode: 0644
+    backup: true
+  loop:
     - name: acct_gather.conf
       config: slurm_acct_gather_config
       template: generic.conf.j2

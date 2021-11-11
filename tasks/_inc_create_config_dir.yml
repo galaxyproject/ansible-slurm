@@ -5,3 +5,4 @@
   file:
     path: "{{ slurm_config_dir }}"
     state: directory
+    mode: 0755

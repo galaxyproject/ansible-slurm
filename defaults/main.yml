@@ -1,6 +1,6 @@
 ---
 
-slurm_upgrade: no
+slurm_upgrade: false
 slurm_roles: []
 slurm_partitions: []
 slurm_nodes: []
@@ -10,7 +10,7 @@ slurm_config_dir: "{{ '/etc/slurm-llnl' if __slurm_debian else '/etc/slurm' }}"
 slurm_create_user: "{{ __slurm_redhat }}"
 slurm_create_dirs: "{{ __slurm_redhat }}"
 slurm_rotate_logs: "{{ __slurm_redhat }}"
-slurm_configure_munge: yes
+slurm_configure_munge: true
 
 # Service names are the same on both distros since ??
 slurmd_service_name: slurmd
@@ -64,7 +64,7 @@ __slurm_config_default:
 __slurm_config_merged: "{{ __slurm_config_default | combine(slurm_config | default({})) }}"
 
 __slurm_debian_packages:
-  client:  [slurm-client, slurm-wlm-doc]
+  client: [slurm-client, slurm-wlm-doc]
   slurmctld: [slurm-wlm]
   slurmd: [slurm-wlm]
   slurmdbd: [slurmdbd]
