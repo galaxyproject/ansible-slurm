@@ -5,16 +5,6 @@
     name: "{{ __slurm_packages.slurmdbd }}"
     state: "{{ 'latest' if slurm_upgrade else 'present' }}"
 
-- name: Install slurmdbd.conf
-  template:
-    src: generic.conf.j2
-    dest: "{{ slurm_config_dir }}/slurmdbd.conf"
-    owner: "{{ __slurm_user_name }}"
-    group: root
-    mode: 0400
-  notify:
-    - reload slurmdbd
-
 - name: Create slurm log directory
   file:
     path: "{{ __slurmdbd_config_merged.LogFile | dirname }}"
@@ -22,4 +12,23 @@
     group: "{{ __slurm_group_name }}"
     mode: 0755
     state: directory
-  when: slurm_create_dirs and __slurmdbd_config_merged.LogFile
+  when: slurm_create_dirs and __slurmdbd_config_merged.LogFile != omit
+
+- name: Include config dir creation tasks
+  include_tasks: _inc_create_config_dir.yml
+  when: slurm_create_dirs
+
+- name: Install slurmdbd.conf
+  template:
+    src: generic.conf.j2
+    dest: "{{ slurm_config_dir }}/{{ item.name }}"
+    owner: "{{ __slurm_user_name }}"
+    group: root
+    mode: 0600
+  with_items:
+    - name: slurmdbd.conf
+      config: __slurmdbd_config_merged
+  loop_control:
+    label: "{{ item.name }}"
+  notify:
+    - reload slurmdbd

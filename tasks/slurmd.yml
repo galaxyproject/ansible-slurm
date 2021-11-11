@@ -29,12 +29,5 @@
   include_tasks: _inc_create_config_dir.yml
   when: slurm_create_dirs
 
-- name: Install extra execution host configs
-  template:
-    src: generic.conf.j2
-    dest: "{{ slurm_config_dir }}/{{ item.name }}"
-    backup: yes
-  with_items:
-    - name: cgroup.conf
-      config: slurm_cgroup_config
-  when: item.config in vars
+- name: Include extra config creation tasks
+  include_tasks: _inc_extra_configs.yml

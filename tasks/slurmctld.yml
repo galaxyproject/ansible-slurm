@@ -24,3 +24,10 @@
     mode: 0755
     state: directory
   when: slurm_create_dirs and __slurm_config_merged.SlurmctldLogFile != omit
+
+- name: Include config dir creation tasks
+  include_tasks: _inc_create_config_dir.yml
+  when: slurm_create_dirs
+
+- name: Include extra config creation tasks
+  include_tasks: _inc_extra_configs.yml
