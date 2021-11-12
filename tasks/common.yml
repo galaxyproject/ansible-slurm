@@ -13,6 +13,7 @@
   template:
     src: logrotate.j2
     dest: /etc/logrotate.d/slurm
+    mode: 0644
   when: slurm_rotate_logs
 
 - name: Install slurm.conf

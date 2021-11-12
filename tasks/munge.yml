@@ -22,5 +22,5 @@
 - name: Ensure Munge is enabled and running
   service:
     name: munge
-    enabled: yes
+    enabled: true
     state: started
