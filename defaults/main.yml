@@ -17,6 +17,8 @@ slurmd_service_name: slurmd
 slurmctld_service_name: slurmctld
 slurmdbd_service_name: slurmdbd
 
+slurm_start_services: true
+
 __slurm_user_name: "{{ (slurm_user | default({})).name | default('slurm') }}"
 # TODO: this could be incorrect, use the group collection from galaxyproject.galaxy
 __slurm_group_name: "{{ (slurm_user | default({})).group | default(omit) }}"

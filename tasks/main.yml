@@ -24,18 +24,18 @@
     name: "{{ slurmdbd_service_name }}"
     enabled: true
     state: started
-  when: "'slurmdbdservers' in group_names or 'dbd' in slurm_roles"
+  when: "slurm_start_services and ('slurmdbdservers' in group_names or 'dbd' in slurm_roles)"
 
 - name: Ensure slurmctld is enabled and running
   service:
     name: "{{ slurmctld_service_name }}"
     enabled: true
     state: started
-  when: "'slurmservers' in group_names or 'controller' in slurm_roles"
+  when: "slurm_start_services and ('slurmservers' in group_names or 'controller' in slurm_roles)"
 
 - name: Ensure slurmd is enabled and running
   service:
     name: "{{ slurmd_service_name }}"
     enabled: true
     state: started
-  when: "'slurmexechosts' in group_names or 'exec' in slurm_roles"
+  when: "slurm_start_services and ('slurmexechosts' in group_names or 'exec' in slurm_roles)"
