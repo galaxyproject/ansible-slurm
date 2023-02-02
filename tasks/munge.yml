@@ -1,12 +1,41 @@
 ---
+- name: Ensure group Munge exists
+  ansible.builtin.group:
+    name: munge
+    state: present
+    gid: "{{ munge_gid }}"
 
-- name: Check munge dir
-  file:
-    path: /etc/munge
+- name: Create Munge user
+  ansible.builtin.user:
+    name: munge
+    group: munge
+    uid: "{{ munge_uid }}"
+    state: present
+    shell: /usr/sbin/nologin
+    system: no
+    createhome: no
+    home: /nonexistent
+
+- name: Create Munge directories
+  ansible.builtin.file:
+    path: "{{ item }}"
     owner: munge
     group: munge
-    mode: 0700
     state: directory
+    mode: 0755
+  with_items:
+    - "{{ munge_config }}"
+    - "{{ munge_lib_path }}"
+    - "{{ munge_log_path }}"
+    - "{{ munge_run_path }}"
+
+- name: Packages for Munge
+  ansible.builtin.package:
+    name:
+      - munge
+  tags:
+    - packages
+  notify: Restart munge
 
 - name: Install munge key
   copy:

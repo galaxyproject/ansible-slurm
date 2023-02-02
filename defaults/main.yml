@@ -89,3 +89,10 @@ __slurmdbd_config_default:
     }}
   LogFile: "{{ '/var/log/slurm-llnl/slurmdbd.log' if __slurm_debian else omit }}"
 __slurmdbd_config_merged: "{{ __slurmdbd_config_default | combine(slurmdbd_config | default({})) }}"
+# Munge
+munge_uid: 997
+munge_gid: 995
+munge_config: "/etc/munge"
+munge_lib_path: "/var/lib/munge"
+munge_log_path: "/var/log/munge"
+munge_run_path: "/var/run/munge"
