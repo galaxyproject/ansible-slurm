@@ -20,5 +20,5 @@
     label: "{{ item.name }}"
   when: item.config in vars
   notify:
-    - reload slurmctld
-    - reload slurmd
+    - Reload slurmctld
+    - Reload slurmd

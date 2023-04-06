@@ -14,7 +14,7 @@
     state: directory
   when: slurm_create_dirs
   notify:
-    - reload slurmctld
+    - Reload slurmctld
 
 - name: Create slurm log directory
   ansible.builtin.file:
