@@ -2,7 +2,7 @@
 
 # As of 17.11, this is only created if you install the example configs package (RedHat)
 - name: Create slurm config dir
-  file:
+  ansible.builtin.file:
     path: "{{ slurm_config_dir }}"
     state: directory
     mode: 0755

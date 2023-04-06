@@ -1,40 +1,40 @@
 ---
 
 - name: Include user creation tasks
-  include_tasks: user.yml
+  ansible.builtin.include_tasks: user.yml
   when: slurm_create_user
 
 - name: Include controller installation tasks
-  include_tasks: slurmctld.yml
+  ansible.builtin.include_tasks: slurmctld.yml
   when: "'slurmservers' in group_names or 'controller' in slurm_roles"
 
 - name: Include execution host installation tasks
-  include_tasks: slurmd.yml
+  ansible.builtin.include_tasks: slurmd.yml
   when: "'slurmexechosts' in group_names or 'exec' in slurm_roles"
 
 - name: Include DB installation tasks
-  include_tasks: slurmdbd.yml
+  ansible.builtin.include_tasks: slurmdbd.yml
   when: "'slurmdbdservers' in group_names or 'dbd' in slurm_roles"
 
 - name: Import common tasks
-  import_tasks: common.yml
+  ansible.builtin.import_tasks: common.yml
 
 - name: Ensure slurmdbd is enabled and running
-  service:
+  ansible.builtin.service:
     name: "{{ slurmdbd_service_name }}"
     enabled: true
     state: started
   when: "slurm_start_services and ('slurmdbdservers' in group_names or 'dbd' in slurm_roles)"
 
 - name: Ensure slurmctld is enabled and running
-  service:
+  ansible.builtin.service:
     name: "{{ slurmctld_service_name }}"
     enabled: true
     state: started
   when: "slurm_start_services and ('slurmservers' in group_names or 'controller' in slurm_roles)"
 
 - name: Ensure slurmd is enabled and running
-  service:
+  ansible.builtin.service:
     name: "{{ slurmd_service_name }}"
     enabled: true
     state: started

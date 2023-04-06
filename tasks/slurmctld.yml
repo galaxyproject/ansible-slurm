@@ -1,12 +1,12 @@
 ---
 
 - name: Install Slurm controller packages
-  package:
+  ansible.builtin.package:
     name: "{{ __slurm_packages.slurmctld }}"
     state: "{{ 'latest' if slurm_upgrade else 'present' }}"
 
 - name: Create slurm state directory
-  file:
+  ansible.builtin.file:
     path: "{{ __slurm_config_merged.StateSaveLocation }}"
     owner: "{{ __slurm_user_name }}"
     group: "{{ __slurm_group_name }}"
@@ -17,7 +17,7 @@
     - reload slurmctld
 
 - name: Create slurm log directory
-  file:
+  ansible.builtin.file:
     path: "{{ __slurm_config_merged.SlurmctldLogFile | dirname }}"
     owner: "{{ __slurm_user_name }}"
     group: "{{ __slurm_group_name }}"
@@ -26,8 +26,8 @@
   when: slurm_create_dirs and __slurm_config_merged.SlurmctldLogFile != omit
 
 - name: Include config dir creation tasks
-  include_tasks: _inc_create_config_dir.yml
+  ansible.builtin.include_tasks: _inc_create_config_dir.yml
   when: slurm_create_dirs
 
 - name: Include extra config creation tasks
-  include_tasks: _inc_extra_configs.yml
+  ansible.builtin.include_tasks: _inc_extra_configs.yml

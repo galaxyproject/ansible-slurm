@@ -1,7 +1,7 @@
 ---
 
 - name: Install extra execution host configs
-  template:
+  ansible.builtin.template:
     src: "{{ item.template }}"
     dest: "{{ slurm_config_dir }}/{{ item.name }}"
     mode: 0644
