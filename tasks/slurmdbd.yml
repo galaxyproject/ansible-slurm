@@ -1,12 +1,12 @@
 ---
 
 - name: Install Slurm DB packages
-  package:
+  ansible.builtin.package:
     name: "{{ __slurm_packages.slurmdbd }}"
     state: "{{ 'latest' if slurm_upgrade else 'present' }}"
 
 - name: Create slurm log directory
-  file:
+  ansible.builtin.file:
     path: "{{ __slurmdbd_config_merged.LogFile | dirname }}"
     owner: "{{ __slurm_user_name }}"
     group: "{{ __slurm_group_name }}"
@@ -15,11 +15,11 @@
   when: slurm_create_dirs and __slurmdbd_config_merged.LogFile != omit
 
 - name: Include config dir creation tasks
-  include_tasks: _inc_create_config_dir.yml
+  ansible.builtin.include_tasks: _inc_create_config_dir.yml
   when: slurm_create_dirs
 
 - name: Install slurmdbd.conf
-  template:
+  ansible.builtin.template:
     src: generic.conf.j2
     dest: "{{ slurm_config_dir }}/{{ item.name }}"
     owner: "{{ __slurm_user_name }}"
