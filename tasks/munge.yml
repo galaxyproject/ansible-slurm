@@ -17,7 +17,7 @@
     mode: 0400
   when: slurm_munge_key is defined
   notify:
-    - restart munge
+    - Restart munge
 
 - name: Ensure Munge is enabled and running
   ansible.builtin.service:

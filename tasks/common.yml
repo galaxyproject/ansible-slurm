@@ -24,8 +24,8 @@
     group: root
     mode: 0444
   notify:
-    - restart slurmd
-    - restart slurmctld
+    - Restart slurmd
+    - Restart slurmctld
 
 - name: Include munge tasks
   ansible.builtin.include_tasks: munge.yml
