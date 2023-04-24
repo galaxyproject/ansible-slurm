@@ -19,6 +19,9 @@ slurmdbd_service_name: slurmdbd
 
 slurm_start_services: true
 
+#to setup custom systemd unit files
+slurm_configure_systemd: false
+
 __slurm_user_name: "{{ (slurm_user | default({})).name | default('slurm') }}"
 # TODO: this could be incorrect, use the group collection from galaxyproject.galaxy
 __slurm_group_name: "{{ (slurm_user | default({})).group | default(omit) }}"

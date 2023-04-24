@@ -25,6 +25,17 @@
     state: directory
   when: slurm_create_dirs and __slurm_config_merged.SlurmctldLogFile != omit
 
+- name: Add slurmctld service
+  ansible.builtin.copy:
+    src: slurmctld.service
+    dest: /etc/systemd/system/slurmctld.service
+    owner: root
+    group: root
+    mode: 0644
+  when: slurm_configure_systemd
+  notify:
+    - Restart slurmctld
+
 - name: Include config dir creation tasks
   ansible.builtin.include_tasks: _inc_create_config_dir.yml
   when: slurm_create_dirs
