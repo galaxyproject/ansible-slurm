@@ -2,7 +2,7 @@
 # Slurm Logrotate Configuration
 ##
 # TODO: this ignores the actual *LogFile values
-{{ '/var/log/slurm-llnl' if __slurm_debian else '/var/log/slurm' }}/*.log {
+{{ '/var/log/slurm-llnl' if (not slurm_configure_repos and __slurm_debian) else '/var/log/slurm' }}/*.log {
 	compress
 	missingok
 	nocopytruncate

@@ -19,6 +19,9 @@ slurmdbd_service_name: slurmdbd
 
 slurm_start_services: true
 
+
+# install from custom debian repos
+slurm_configure_repos: false
 #to setup custom systemd unit files
 slurm_configure_systemd: false
 

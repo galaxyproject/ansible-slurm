@@ -3,6 +3,10 @@
 - name: Include user creation tasks
   ansible.builtin.include_tasks: user.yml
   when: slurm_create_user
+ 
+- name: Include Configure custom repositories
+  ansible.builtin.include_tasks: repositories-Debian.yml
+  when: slurm_configure_repos
 
 - name: Include controller installation tasks
   ansible.builtin.include_tasks: slurmctld.yml

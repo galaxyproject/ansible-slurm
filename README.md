@@ -2,6 +2,18 @@ Slurm
 =====
 
 Install and configure a Slurm cluster on RHEL/CentOS or Debian/Ubuntu servers
+To configure a custom Debian repository, define `slurm_configure_repos: true`.
+
+Then, define the APT  repositories with the URL to the GPG key.
+
+    # Example apt repository
+    slurm_apt_repository: "deb [trusted=yes] http://127.0.0.1/ubuntu/22.04/amd64/  ./"
+    # Example GPG key
+    slurm_gpg_key: 'http://127.0.0.1/ubuntu/22.04/amd64/GPG-KEY-slurm'
+     
+Define `slurm_apt_priority` to pin the priority of the repository (APT only). This is optional.
+
+    slurm_apt_priority: 900
 
 Role Variables
 --------------

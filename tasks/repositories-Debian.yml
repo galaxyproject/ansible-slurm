@@ -1,0 +1,26 @@
+---
+- name: Install GPG-KEY
+  ansible.builtin.apt_key:
+    url: "{{ slurm_gpg_key }}"
+    keyring: /etc/apt/trusted.gpg.d/slurm.gpg
+  when: slurm_gpg_key is defined
+
+- name: Configure Slurm repository
+  ansible.builtin.copy:
+    content: "{{ slurm_apt_repository }}\n"
+    dest: /etc/apt/sources.list.d/slurm.list
+    mode: 0644
+
+- name: Configure APT preferences for Slurm repository
+  ansible.builtin.copy:
+    content: |
+      Package: *
+      Pin: release o=SLURM
+      Pin-Priority: {{ slurm_apt_priority }}
+    dest: /etc/apt/preferences.d/priority-slurm
+    mode: 0644
+  when: slurm_apt_priority is defined
+
+- name: "Update repository cache"
+  ansible.builtin.apt:
+    update_cache: yes
