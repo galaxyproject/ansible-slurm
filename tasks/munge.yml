@@ -1,7 +1,7 @@
 ---
 
 - name: Check munge dir
-  file:
+  ansible.builtin.file:
     path: /etc/munge
     owner: munge
     group: munge
@@ -9,16 +9,18 @@
     state: directory
 
 - name: Install munge key
-  copy:
+  ansible.builtin.copy:
     src: "{{ slurm_munge_key }}"
     dest: /etc/munge/munge.key
     owner: munge
     group: munge
     mode: 0400
   when: slurm_munge_key is defined
+  notify:
+    - Restart munge
 
 - name: Ensure Munge is enabled and running
-  service:
+  ansible.builtin.service:
     name: munge
-    enabled: yes
+    enabled: true
     state: started

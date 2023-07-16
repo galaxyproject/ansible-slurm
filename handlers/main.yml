@@ -1,31 +1,36 @@
 ---
-
-- name: reload slurmd
-  service:
-    name: "{{ slurmd_service_name }}"
-    state: reloaded
-  when: "'slurmexechosts' in group_names or 'exec' in slurm_roles"
-
-- name: restart slurmd
-  service:
-    name: "{{ slurmd_service_name }}"
+- name: Restart munge
+  ansible.builtin.service:
+    name: munge
     state: restarted
-  when: "'slurmexechosts' in group_names or 'exec' in slurm_roles"
 
-- name: reload slurmctld
-  service:
-    name: "{{ slurmctld_service_name }}"
-    state: reloaded
-  when: "'slurmservers' in group_names or 'controller' in slurm_roles"
-
-- name: restart slurmctld
-  service:
-    name: "{{ slurmctld_service_name }}"
-    state: restarted
-  when: "'slurmservers' in group_names or 'controller' in slurm_roles"
-
-- name: reload slurmdbd
-  service:
+- name: Reload slurmdbd
+  ansible.builtin.service:
     name: "{{ slurmdbd_service_name }}"
     state: reloaded
-  when: "'slurmdbdservers' in group_names or 'dbd' in slurm_roles"
+  when: "slurm_start_services and ('slurmdbdservers' in group_names or 'dbd' in slurm_roles)"
+  service:
+
+- name: Reload slurmctld
+  ansible.builtin.service:
+    name: "{{ slurmctld_service_name }}"
+    state: reloaded
+  when: "slurm_start_services and ('slurmservers' in group_names or 'controller' in slurm_roles)"
+
+- name: Restart slurmctld
+  ansible.builtin.service:
+    name: "{{ slurmctld_service_name }}"
+    state: restarted
+  when: "slurm_start_services and ('slurmservers' in group_names or 'controller' in slurm_roles)"
+
+- name: Reload slurmd
+  ansible.builtin.service:
+    name: "{{ slurmd_service_name }}"
+    state: reloaded
+  when: "slurm_start_services and ('slurmexechosts' in group_names or 'exec' in slurm_roles)"
+
+- name: Restart slurmd
+  ansible.builtin.service:
+    name: "{{ slurmd_service_name }}"
+    state: restarted
+  when: "slurm_start_services and ('slurmexechosts' in group_names or 'exec' in slurm_roles)"

@@ -1,16 +1,16 @@
 ---
 
-slurm_upgrade: no
+slurm_upgrade: false
 slurm_roles: []
 slurm_partitions: []
 slurm_nodes: []
 
-slurm_config_dir: "{{ '/etc/slurm-llnl' if __slurm_debian else '/etc/slurm' }}"
+slurm_config_dir: "{{ '/etc/slurm-llnl' if __slurm_llnl else '/etc/slurm' }}"
 
 slurm_create_user: "{{ __slurm_redhat }}"
 slurm_create_dirs: "{{ __slurm_redhat }}"
 slurm_rotate_logs: "{{ __slurm_redhat }}"
-slurm_configure_munge: yes
+slurm_configure_munge: true
 
 # Service names are the same on both distros since ??
 slurmd_service_name: slurmd
@@ -21,10 +21,24 @@ slurmdbd_service_name: slurmdbd
 __slurm_cluster_name: cluster
 __cluster_not_setup: true #Default value. Is modified if cluster already exists.
 
+slurm_start_services: true
+
 __slurm_user_name: "{{ (slurm_user | default({})).name | default('slurm') }}"
 # TODO: this could be incorrect, use the group collection from galaxyproject.galaxy
 __slurm_group_name: "{{ (slurm_user | default({})).group | default(omit) }}"
 
+__slurm_run_dir: >-
+  {{
+    ((ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('20', '<')) or 
+     (ansible_distribution == 'Debian' and ansible_distribution_major_version is version('10', '<')))
+    | ternary('/var/run/slurm-llnl', '/run')
+  }}
+__slurm_llnl: >-
+  {{
+    (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('22', '<')) or 
+    (ansible_distribution == 'Debian' and ansible_distribution_major_version is version('11', '<'))
+  }}
+__slurm_log_dir: "{{ __slurm_llnl | ternary('/var/log/slurm-llnl', '/var/log/slurm') }}"
 __slurm_debian: "{{ ansible_os_family == 'Debian' }}"
 __slurm_redhat: "{{ ansible_os_family == 'RedHat' }}"
 
@@ -37,34 +51,30 @@ __slurm_config_default:
   ProctrackType: proctrack/pgid
   # slurmctld options
   SlurmctldPort: 6817
-  SlurmctldLogFile: "{{ '/var/log/slurm-llnl/slurmctld.log' if __slurm_debian else omit }}"
-  SlurmctldPidFile: >-
-    {{
-        '/var/run/slurm-llnl/slurmctld.pid' if __slurm_debian else omit
-    }}
+  SlurmctldLogFile: "{{ __slurm_log_dir ~ '/slurmctld.log' if __slurm_debian else omit }}"
+  SlurmctldPidFile: "{{ __slurm_run_dir ~ '/slurmctld.pid' if __slurm_debian else omit }}"
   StateSaveLocation: >-
     {{
-        '/var/lib/slurm-llnl/slurmctld' if __slurm_debian else (
-        '/var/lib/slurm/slurmctld' if __slurm_redhat else
-        omit)
+      '/var/lib/slurm-llnl/slurmctld' if __slurm_llnl else (
+      '/var/lib/slurm/slurmctld' if __slurm_debian else (
+      '/var/spool/slurm/ctld' if __slurm_redhat else
+      omit))
     }}
   # slurmd options
   SlurmdPort: 6818
-  SlurmdLogFile: "{{ '/var/log/slurm-llnl/slurmd.log' if __slurm_debian else omit }}"
-  SlurmdPidFile: >-
-    {{
-        '/var/run/slurm-llnl/slurmd.pid' if __slurm_debian else omit
-    }}
+  SlurmdLogFile: "{{ __slurm_log_dir ~ '/slurmd.log' if __slurm_debian else omit }}"
+  SlurmdPidFile: "{{ __slurm_run_dir ~ '/slurmd.pid' if __slurm_debian else omit }}"
   SlurmdSpoolDir: >-
     {{
-        '/var/lib/slurm-llnl/slurmd' if __slurm_debian else (
-        '/var/spool/slurm/slurmd' if __slurm_redhat else
-        omit)
+      '/var/lib/slurm-llnl/slurmctld' if __slurm_llnl else (
+      '/var/lib/slurm/slurmctld' if __slurm_debian else (
+      '/var/spool/slurm/d' if __slurm_redhat else
+      omit))
     }}
 __slurm_config_merged: "{{ __slurm_config_default | combine(slurm_config | default({})) }}"
 
 __slurm_debian_packages:
-  client:  [slurm-client, slurm-wlm-doc]
+  client: [slurm-client, slurm-wlm-doc]
   slurmctld: [slurm-wlm]
   slurmd: [slurm-wlm]
   slurmdbd: [slurmdbd]
@@ -81,9 +91,6 @@ __slurmdbd_config_default:
   AuthType: auth/munge
   DbdPort: 6819
   SlurmUser: "{{ __slurm_user_name }}"
-  PidFile: >-
-    {{
-        '/var/run/slurm-llnl/slurmdbd.pid' if __slurm_debian else omit
-    }}
-  LogFile: "{{ '/var/log/slurm-llnl/slurmdbd.log' if __slurm_debian else omit }}"
+  SlurmctldPidFile: "{{ __slurm_run_dir ~ '/slurmdbd.pid' if __slurm_debian else omit }}"
+  LogFile: "{{ __slurm_log_dir ~ '/slurmdbd.log' if __slurm_debian else omit }}"
 __slurmdbd_config_merged: "{{ __slurmdbd_config_default | combine(slurmdbd_config | default({})) }}"

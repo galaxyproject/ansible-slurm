@@ -1,14 +1,14 @@
 ---
 
 - name: Create slurm group
-  group:
+  ansible.builtin.group:
     name: "{{ (slurm_user | default({})).group }}"
     gid: "{{ (slurm_user | default({})).gid | default(omit) }}"
     system: "{{ (slurm_user | default({})).system | default('yes') }}"
   when: (slurm_user | default({})).group is defined
 
 - name: Create slurm user
-  user:
+  ansible.builtin.user:
     name: "{{ (slurm_user | default({})).name | default('slurm') }}"
     comment: "{{ (slurm_user | default({})).comment | default(omit) }}"
     uid: "{{ (slurm_user | default({})).uid | default(omit) }}"

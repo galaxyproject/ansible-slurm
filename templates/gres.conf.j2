@@ -1,0 +1,11 @@
+##
+## This file is maintained by Ansible - ALL MODIFICATIONS WILL BE REVERTED
+##
+
+{% set conf = lookup('vars', item.config) %}
+{% for gres in conf %}
+{% if gres['NodeName'] is not none %}
+NodeName={{ gres['NodeName'] }}{% for key in gres | sort %}{% if key != 'NodeName' %} {{ key }}={{ gres[key] }}{% endif %}{% endfor %}
+
+{% endif %}
+{% endfor %}

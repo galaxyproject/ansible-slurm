@@ -1,0 +1,24 @@
+---
+
+- name: Install extra execution host configs
+  ansible.builtin.template:
+    src: "{{ item.template }}"
+    dest: "{{ slurm_config_dir }}/{{ item.name }}"
+    mode: 0644
+    backup: true
+  loop:
+    - name: acct_gather.conf
+      config: slurm_acct_gather_config
+      template: generic.conf.j2
+    - name: cgroup.conf
+      config: slurm_cgroup_config
+      template: generic.conf.j2
+    - name: gres.conf
+      config: slurm_gres_config
+      template: gres.conf.j2
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.config in vars
+  notify:
+    - Reload slurmctld
+    - Reload slurmd
