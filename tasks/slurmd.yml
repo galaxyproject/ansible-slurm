@@ -5,6 +5,17 @@
     name: "{{ __slurm_packages.slurmd }}"
     state: "{{ 'latest' if slurm_upgrade else 'present' }}"
 
+- name: Get slurm node configuration
+  shell: "slurmd -C | head -n1"
+  register: slurmd_C
+
+- set_fact:
+    slurm_hardwareconfig: >
+      { {% for sub in slurmd_C.stdout.split() %}{% set item = sub.split('=') %}"{{ 'name' if item[0] == 'NodeName' else item[0] }}":"{{ item[1] }}",{% endfor %} }
+
+- name: Gather facts
+  ansible.builtin.gather_facts: {}
+
 - name: Create slurm spool directory
   ansible.builtin.file:
     path: "{{ __slurm_config_merged.SlurmdSpoolDir }}"
