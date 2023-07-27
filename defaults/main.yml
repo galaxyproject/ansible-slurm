@@ -4,6 +4,7 @@ slurm_upgrade: false
 slurm_roles: []
 slurm_partitions: []
 slurm_nodes: []
+slurm_controllers: []
 
 slurm_config_dir: "{{ '/etc/slurm-llnl' if __slurm_llnl else '/etc/slurm' }}"
 
