@@ -16,5 +16,5 @@
   become: yes
   become_user: root
   notify:
-    - reload slurmdbd
+    - Reload slurmdbd
   when: __cluster_not_setup
