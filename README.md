@@ -100,6 +100,8 @@ More extensive example:
       SelectType: "select/cons_res"
       SelectTypeParameters: "CR_Core"
       SlurmctldHost: "slurmctl"
+      # Use a list to configure master and backups Slurmctld hosts
+      # SlurmctldHost: ['slurmctl1', 'slurmctl2']
       SlurmctldLogFile: "/var/log/slurm/slurmctld.log"
       SlurmctldPidFile: "/var/run/slurmctld.pid"
       SlurmdLogFile: "/var/log/slurm/slurmd.log"
