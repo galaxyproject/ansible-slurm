@@ -8,7 +8,7 @@
   ansible.builtin.service:
     name: "{{ slurmdbd_service_name }}"
     state: reloaded
-  when: "slurm_start_services and ('slurmdbdservers' in group_names or 'dbd' in slurm_roles)"
+  when: "(slurm_start_services | bool) and ('slurmdbdservers' in group_names or 'dbd' in slurm_roles)"
 
 - name: Restart slurmdbd
   ansible.builtin.systemd:
@@ -17,13 +17,13 @@
     masked: no
     enabled: yes
     daemon_reload: yes
-  when: "slurm_start_services and ('slurmservers' in group_names or 'controller' in slurm_roles)"
+  when: "(slurm_start_services | bool) and ('slurmservers' in group_names or 'controller' in slurm_roles)"
 
 - name: Reload slurmctld
   ansible.builtin.service:
     name: "{{ slurmctld_service_name }}"
     state: reloaded
-  when: "slurm_start_services and ('slurmservers' in group_names or 'controller' in slurm_roles)"
+  when: "(slurm_start_services | bool) and ('slurmservers' in group_names or 'controller' in slurm_roles)"
 
 - name: Restart slurmctld
   ansible.builtin.systemd:
@@ -32,16 +32,16 @@
     masked: no
     enabled: yes
     daemon_reload: yes
-  when: "slurm_start_services and ('slurmservers' in group_names or 'controller' in slurm_roles)"
+  when: "(slurm_start_services | bool) and ('slurmservers' in group_names or 'controller' in slurm_roles)"
 
 - name: Reload slurmd
   ansible.builtin.service:
     name: "{{ slurmd_service_name }}"
     state: reloaded
-  when: "slurm_start_services and ('slurmexechosts' in group_names or 'exec' in slurm_roles)"
+  when: "(slurm_start_services | bool) and ('slurmexechosts' in group_names or 'exec' in slurm_roles)"
 
 - name: Restart slurmd
   ansible.builtin.service:
     name: "{{ slurmd_service_name }}"
     state: restarted
-  when: "slurm_start_services and ('slurmexechosts' in group_names or 'exec' in slurm_roles)"
+  when: "(slurm_start_services | bool) and ('slurmexechosts' in group_names or 'exec' in slurm_roles)"
