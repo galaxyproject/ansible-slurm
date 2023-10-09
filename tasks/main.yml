@@ -46,4 +46,4 @@
 
 - name: Setup cluster on slurmdb
   include_tasks: slurmdbd_cluster.yml
-  when: "(slurm_start_services | bool) and ('slurmdbdservers' in group_names or 'dbd' in slurm_roles)"
+  when: "(slurm_setup_cluster | bool ) and (slurm_start_services | bool) and ('slurmdbdservers' in group_names or 'dbd' in slurm_roles)"

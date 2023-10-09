@@ -20,6 +20,7 @@ slurmdbd_service_name: slurmdbd
 #Cluster name for slurm config. This is required to correctly setup slurmdbd and attune it to the slurm config.
 __slurm_cluster_name: cluster
 __cluster_not_setup: true #Default value. Is modified if cluster already exists.
+slurm_setup_cluster: false
 
 slurm_start_services: true
 
