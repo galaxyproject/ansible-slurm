@@ -16,6 +16,9 @@
     - name: gres.conf
       config: slurm_gres_config
       template: gres.conf.j2
+    - name: job_container.conf
+      config: slurm_job_container_config
+      template: generic.conf.j2
   loop_control:
     label: "{{ item.name }}"
   when: item.config in vars

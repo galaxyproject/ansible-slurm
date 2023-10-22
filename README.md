@@ -35,9 +35,10 @@ Partitions and nodes go in `slurm_partitions` and `slurm_nodes`, lists of hashes
 of that partition or node.
 
 Options for the additional configuration files [acct_gather.conf](https://slurm.schedmd.com/acct_gather.conf.html),
-[cgroup.conf](https://slurm.schedmd.com/cgroup.conf.html) and [gres.conf](https://slurm.schedmd.com/gres.conf.html)
-may be specified in the `slurm_acct_gather_config`, `slurm_cgroup_config` (both of them hashes) and
-`slurm_gres_config` (list of hashes) respectively.
+[cgroup.conf](https://slurm.schedmd.com/cgroup.conf.html), [gres.conf](https://slurm.schedmd.com/gres.conf.html)
+and [job_container.conf](https://slurm.schedmd.com/job_container.conf.html) may be specified in the
+`slurm_acct_gather_config`, `slurm_cgroup_config` (both of them hashes), `slurm_gres_config` (list of hashes) and
+`slurm_job_container_config` (hashes) respectively.
 
 Set `slurm_upgrade` to true to upgrade the installed Slurm packages.
 
