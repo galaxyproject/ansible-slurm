@@ -3,13 +3,13 @@
 ##
 
 {% set conf = lookup('vars', item.config) %}
-{% for key in conf %}
-{% if key['NodeName'] is not none %}
-NodeName={{ key['NodeName'] }}{% for key in key | sort %}{% if key != 'NodeName' %} {{ key }}={{ key[key] }}{% endif %}{% endfor %}
+{% for gres in conf %}
+{% if 'NodeName' in gres %}
+NodeName={{ gres['NodeName'] }}{% for gres in gres | sort %}{% if gres != 'NodeName' %} {{ gres }}={{ gres[gres] }}{% endif %}{% endfor %}
 {% else %}
-  {% set val = key[key] %}
+  {% set val = gres[gres] %}
 {% if val is not none and val != omit %}
-{{ key }}={{ 'yes' if val is sameas true else ('no' if val is sameas false else val) }}
+{{ gres }}={{ 'yes' if val is sameas true else ('no' if val is sameas false else val) }}
 {% endif %}
 {% endif %}
 {% endfor %}
