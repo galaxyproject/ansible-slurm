@@ -1,6 +1,9 @@
+{{ ansible_managed | comment }}
+
 ##
 # Slurm Logrotate Configuration
 ##
+
 # TODO: this ignores the actual *LogFile values
 {{ '/var/log/slurm-llnl' if __slurm_debian else '/var/log/slurm' }}/*.log {
 	compress
