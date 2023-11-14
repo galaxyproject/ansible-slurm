@@ -3,7 +3,7 @@
 ##
 
 {% set conf = lookup('vars', item.config) %}
-{% for key in conf | sort %}
+{% for key in conf %}
 {% if key['NodeName'] is not none %}
 NodeName={{ key['NodeName'] }}{% for key in key | sort %}{% if key != 'NodeName' %} {{ key }}={{ key[key] }}{% endif %}{% endfor %}
 {% else %}
