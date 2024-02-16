@@ -19,6 +19,12 @@
     daemon_reload: yes
   when: "(slurm_start_services | bool) and ('slurmservers' in group_names or 'controller' in slurm_roles)"
 
+- name: Restart slurmdbd
+  ansible.builtin.service:
+    name: "{{ slurmdbd_service_name }}"
+    state: restarted
+  when: "slurm_start_services and ('slurmdbdservers' in group_names or 'dbd' in slurm_roles)"
+
 - name: Reload slurmctld
   ansible.builtin.service:
     name: "{{ slurmctld_service_name }}"
