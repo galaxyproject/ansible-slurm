@@ -4,6 +4,9 @@
   ansible.builtin.package:
     name: "{{ __slurm_packages.client }}"
     state: "{{ 'latest' if slurm_upgrade else 'present' }}"
+  notify:
+    - Restart slurmd
+    - Restart slurmctld
 
 - name: Include config dir creation tasks
   ansible.builtin.include_tasks: _inc_create_config_dir.yml
