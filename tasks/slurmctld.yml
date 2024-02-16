@@ -4,6 +4,8 @@
   ansible.builtin.package:
     name: "{{ __slurm_packages.slurmctld }}"
     state: "{{ 'latest' if slurm_upgrade else 'present' }}"
+  notify:
+    - Restart slurmctld
 
 - name: Create slurm state directory
   ansible.builtin.file:
