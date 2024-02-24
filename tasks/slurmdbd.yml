@@ -4,6 +4,8 @@
   ansible.builtin.package:
     name: "{{ __slurm_packages.slurmdbd }}"
     state: "{{ 'latest' if slurm_upgrade else 'present' }}"
+  notify:
+    - Restart slurmdbd
 
 - name: Create slurm log directory
   ansible.builtin.file:
