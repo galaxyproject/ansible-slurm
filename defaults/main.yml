@@ -91,6 +91,5 @@ __slurmdbd_config_default:
   AuthType: auth/munge
   DbdPort: 6819
   SlurmUser: "{{ __slurm_user_name }}"
-  SlurmctldPidFile: "{{ __slurm_run_dir ~ '/slurmdbd.pid' if __slurm_debian else omit }}"
   LogFile: "{{ __slurm_log_dir ~ '/slurmdbd.log' if __slurm_debian else omit }}"
 __slurmdbd_config_merged: "{{ __slurmdbd_config_default | combine(slurmdbd_config | default({})) }}"
