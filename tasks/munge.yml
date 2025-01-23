@@ -8,6 +8,31 @@
     mode: 0700
     state: directory
 
+- name: Check if munge key exists
+  delegate_to: localhost
+  become: false
+  stat:
+    path: "{{ slurm_munge_key }}"
+  register:
+    mungekey
+  run_once: true
+  when: slurm_munge_key is defined
+
+- name: Create munge key
+  command: sudo -u munge mungekey
+  args:
+    creates: "{{ slurm_munge_key }}"
+  run_once: true
+  when: slurm_munge_key is defined and not mungekey.stat.exists
+
+- name: Fetch munge key
+  fetch:
+    src: /etc/munge/munge.key
+    dest: "{{ slurm_munge_key }}"
+    flat: yes
+  run_once: true
+  when: slurm_munge_key is defined and not mungekey.stat.exists
+
 - name: Install munge key
   ansible.builtin.copy:
     src: "{{ slurm_munge_key }}"
