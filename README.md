@@ -2,6 +2,18 @@ Slurm
 =====
 
 Install and configure a Slurm cluster on RHEL/CentOS or Debian/Ubuntu servers
+To configure a custom Debian repository, define `slurm_configure_repos: true`.
+
+Then, define the APT  repositories with the URL to the GPG key.
+
+    # Example apt repository
+    slurm_apt_repository: "deb [trusted=yes] http://127.0.0.1/ubuntu/22.04/amd64/  ./"
+    # Example GPG key
+    slurm_gpg_key: 'http://127.0.0.1/ubuntu/22.04/amd64/GPG-KEY-slurm'
+     
+Define `slurm_apt_priority` to pin the priority of the repository (APT only). This is optional.
+
+    slurm_apt_priority: 900
 
 Role Variables
 --------------
@@ -23,9 +35,10 @@ Partitions and nodes go in `slurm_partitions` and `slurm_nodes`, lists of hashes
 of that partition or node.
 
 Options for the additional configuration files [acct_gather.conf](https://slurm.schedmd.com/acct_gather.conf.html),
-[cgroup.conf](https://slurm.schedmd.com/cgroup.conf.html) and [gres.conf](https://slurm.schedmd.com/gres.conf.html)
-may be specified in the `slurm_acct_gather_config`, `slurm_cgroup_config` (both of them hashes) and
-`slurm_gres_config` (list of hashes) respectively.
+[cgroup.conf](https://slurm.schedmd.com/cgroup.conf.html), [gres.conf](https://slurm.schedmd.com/gres.conf.html)
+and [job_container.conf](https://slurm.schedmd.com/job_container.conf.html) may be specified in the
+`slurm_acct_gather_config`, `slurm_cgroup_config` (both of them hashes), `slurm_gres_config` (list of hashes) and
+`slurm_job_container_config` (hashes) respectively.
 
 Set `slurm_upgrade` to true to upgrade the installed Slurm packages.
 
@@ -88,6 +101,8 @@ More extensive example:
       SelectType: "select/cons_res"
       SelectTypeParameters: "CR_Core"
       SlurmctldHost: "slurmctl"
+      # Use a list to configure master and backups Slurmctld hosts
+      # SlurmctldHost: ['slurmctl1', 'slurmctl2']
       SlurmctldLogFile: "/var/log/slurm/slurmctld.log"
       SlurmctldPidFile: "/var/run/slurmctld.pid"
       SlurmdLogFile: "/var/log/slurm/slurmd.log"
