@@ -1,6 +1,4 @@
-##
-## This file is maintained by Ansible - ALL MODIFICATIONS WILL BE REVERTED
-##
+{{ ansible_managed | comment }}
 
 {% if 'ControlMachine' not in __slurm_config_merged and 'SlurmctldHost' not in __slurm_config_merged %}
 # Default, define SlurmctldHost or ControlMachine to override
