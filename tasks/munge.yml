@@ -8,6 +8,15 @@
     mode: 0700
     state: directory
 
+- name: Generate a munge key if none specified
+  command: create-munge-key
+  args:
+    creates: /etc/munge/munge.key
+  when: slurm_munge_key is not defined
+  become: yes
+  notify:
+    - restart munge
+
 - name: Install munge key
   ansible.builtin.copy:
     src: "{{ slurm_munge_key }}"
