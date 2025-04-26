@@ -44,3 +44,7 @@
 
 - name: Include extra config creation tasks
   ansible.builtin.include_tasks: _inc_extra_configs.yml
+
+- name: Include job_submit.lua installation tasks
+  ansible.builtin.include_tasks: job_submit_lua.yml
+  when: slurm_job_submit_lua is defined

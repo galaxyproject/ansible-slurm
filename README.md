@@ -77,6 +77,14 @@ Set `slurm_upgrade` to true to upgrade the installed Slurm packages.
 
 You can use `slurm_user` (a hash) and `slurm_create_user` (a bool) to pre-create a Slurm user so that uids match.
 
+To install a custom `job_submit.lua` script on Slurm controller nodes, define
+`slurm_job_submit_lua` with the path to your script in the Ansible inventory.
+The script will be copied to the Slurm configuration directory with the correct
+permissions.
+
+    # Example: job_submit.lua from inventory
+    slurm_job_submit_lua: "{{ inventory_dir }}/files/slurm/job_submit.lua"
+
 Note that this role requires root access, so enable ``become`` either globally in your playbook / on the commandline or
 just for the role like [shown below](#example-playbooks).
 

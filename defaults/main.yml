@@ -24,6 +24,8 @@ slurm_setup_cluster: false
 
 slurm_start_services: true
 
+# Path to the job_submit.lua file
+# slurm_job_submit_lua: "{{ inventory_dir }}/files/slurm/job_submit.lua"
 
 # install from custom debian repos
 slurm_configure_repos: false
