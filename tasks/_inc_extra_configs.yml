@@ -25,3 +25,15 @@
   notify:
     - Reload slurmctld
     - Reload slurmd
+
+- name: Install reboot program script
+  ansible.builtin.template:
+    src: reboot_program.j2
+    dest: "{{ slurm_config_dir }}/reboot_program"
+    mode: 0755
+    owner: root
+    group: root
+  when: slurm_reboot_program | bool
+  notify:
+    - Reload slurmctld
+    - Reload slurmd

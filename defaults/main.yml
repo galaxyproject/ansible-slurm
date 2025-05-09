@@ -100,3 +100,6 @@ __slurmdbd_config_default:
   SlurmUser: "{{ __slurm_user_name }}"
   LogFile: "{{ __slurm_log_dir ~ '/slurmdbd.log' if __slurm_debian else omit }}"
 __slurmdbd_config_merged: "{{ __slurmdbd_config_default | combine(slurmdbd_config | default({})) }}"
+
+# Reboot program configuration
+slurm_reboot_program: false

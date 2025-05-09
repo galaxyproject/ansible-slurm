@@ -40,6 +40,39 @@ and [job_container.conf](https://slurm.schedmd.com/job_container.conf.html) may 
 `slurm_acct_gather_config`, `slurm_cgroup_config` (both of them hashes), `slurm_gres_config` (list of hashes) and
 `slurm_job_container_config` (hashes) respectively.
 
+## Node Reboot Support
+
+The role supports automatic node rebooting through Slurm's RebootProgram
+feature. To enable this:
+
+1. Set `slurm_reboot_program: true` in your playbook
+2. Configure the reboot program in `slurm_config`:
+```yaml
+slurm_config:
+  RebootProgram: "{{ slurm_config_dir }}/reboot_program"
+```
+
+The reboot program will attempt to reboot nodes using either systemd or
+traditional init systems, depending on what's available on the node.
+
+### Pre-Reboot Script
+
+You can customize the actions that run before a node reboots by setting the
+`slurm_pre_reboot_script` variable.
+
+Example configuration:
+```yaml
+slurm_reboot_program: true
+slurm_pre_reboot_script: |
+  #!/bin/bash
+  # Save node state before reboot
+  logger "Saving state for node $1"
+  # Your custom actions here
+  exit 0
+slurm_config:
+  RebootProgram: "{{ slurm_config_dir }}/reboot_program"
+```
+
 Set `slurm_upgrade` to true to upgrade the installed Slurm packages.
 
 You can use `slurm_user` (a hash) and `slurm_create_user` (a bool) to pre-create a Slurm user so that uids match.
