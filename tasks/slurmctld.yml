@@ -4,6 +4,8 @@
   ansible.builtin.package:
     name: "{{ __slurm_packages.slurmctld }}"
     state: "{{ 'latest' if slurm_upgrade else 'present' }}"
+  notify:
+    - Restart slurmctld
 
 - name: Create slurm state directory
   ansible.builtin.file:
@@ -25,9 +27,24 @@
     state: directory
   when: slurm_create_dirs and __slurm_config_merged.SlurmctldLogFile != omit
 
+- name: Add slurmctld service
+  ansible.builtin.copy:
+    src: slurmctld.service
+    dest: /etc/systemd/system/slurmctld.service
+    owner: root
+    group: root
+    mode: 0644
+  when: slurm_configure_systemd
+  notify:
+    - Restart slurmctld
+
 - name: Include config dir creation tasks
   ansible.builtin.include_tasks: _inc_create_config_dir.yml
   when: slurm_create_dirs
 
 - name: Include extra config creation tasks
   ansible.builtin.include_tasks: _inc_extra_configs.yml
+
+- name: Include job_submit.lua installation tasks
+  ansible.builtin.include_tasks: job_submit_lua.yml
+  when: slurm_job_submit_lua is defined

@@ -16,6 +16,25 @@
     mode: 0644
   when: slurm_rotate_logs
 
+- name: Install plugstack.conf
+  ansible.builtin.template:
+    src: "plugstack.conf.j2"
+    dest: "{{ slurm_config_dir }}/plugstack.conf"
+    owner: root
+    group: root
+    mode: 0444
+  notify:
+    - Restart slurmd
+    - Restart slurmctld
+
+- name: Check that slurm plugin dir exists
+  ansible.builtin.file:
+    path: "{{ slurm_config_dir }}/plugstack.conf.d/"
+    state: directory
+  notify:
+    - Restart slurmd
+    - Restart slurmctld
+
 - name: Install slurm.conf
   ansible.builtin.template:
     src: "slurm.conf.j2"

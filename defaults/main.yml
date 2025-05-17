@@ -20,8 +20,17 @@ slurmdbd_service_name: slurmdbd
 #Cluster name for slurm config. This is required to correctly setup slurmdbd and attune it to the slurm config.
 __slurm_cluster_name: cluster
 __cluster_not_setup: true #Default value. Is modified if cluster already exists.
+slurm_setup_cluster: false
 
 slurm_start_services: true
+
+# Path to the job_submit.lua file
+# slurm_job_submit_lua: "{{ inventory_dir }}/files/slurm/job_submit.lua"
+
+# install from custom debian repos
+slurm_configure_repos: false
+#to setup custom systemd unit files
+slurm_configure_systemd: false
 
 __slurm_user_name: "{{ (slurm_user | default({})).name | default('slurm') }}"
 # TODO: this could be incorrect, use the group collection from galaxyproject.galaxy
@@ -91,6 +100,8 @@ __slurmdbd_config_default:
   AuthType: auth/munge
   DbdPort: 6819
   SlurmUser: "{{ __slurm_user_name }}"
-  SlurmctldPidFile: "{{ __slurm_run_dir ~ '/slurmdbd.pid' if __slurm_debian else omit }}"
   LogFile: "{{ __slurm_log_dir ~ '/slurmdbd.log' if __slurm_debian else omit }}"
 __slurmdbd_config_merged: "{{ __slurmdbd_config_default | combine(slurmdbd_config | default({})) }}"
+
+# Reboot program configuration
+slurm_reboot_program: false

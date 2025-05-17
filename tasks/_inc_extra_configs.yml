@@ -16,9 +16,24 @@
     - name: gres.conf
       config: slurm_gres_config
       template: gres.conf.j2
+    - name: job_container.conf
+      config: slurm_job_container_config
+      template: generic.conf.j2
   loop_control:
     label: "{{ item.name }}"
   when: item.config in vars
+  notify:
+    - Reload slurmctld
+    - Reload slurmd
+
+- name: Install reboot program script
+  ansible.builtin.template:
+    src: reboot_program.j2
+    dest: "{{ slurm_config_dir }}/reboot_program"
+    mode: 0755
+    owner: root
+    group: root
+  when: slurm_reboot_program | bool
   notify:
     - Reload slurmctld
     - Reload slurmd
