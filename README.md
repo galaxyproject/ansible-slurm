@@ -40,6 +40,10 @@ and [job_container.conf](https://slurm.schedmd.com/job_container.conf.html) may 
 `slurm_acct_gather_config`, `slurm_cgroup_config` (both of them hashes), `slurm_gres_config` (list of hashes) and
 `slurm_job_container_config` (hashes) respectively.
 
+Set `slurm_upgrade` to true to upgrade the installed Slurm packages.
+
+You can use `slurm_user` (a hash) and `slurm_create_user` (a bool) to pre-create a Slurm user so that uids match.
+
 ## Node Reboot Support
 
 The role supports automatic node rebooting through Slurm's RebootProgram
@@ -64,18 +68,15 @@ Example configuration:
 ```yaml
 slurm_reboot_program: true
 slurm_pre_reboot_script: |
-  #!/bin/bash
   # Save node state before reboot
-  logger "Saving state for node $1"
+  logger "Saving state for node"
   # Your custom actions here
   exit 0
 slurm_config:
   RebootProgram: "{{ slurm_config_dir }}/reboot_program"
 ```
 
-Set `slurm_upgrade` to true to upgrade the installed Slurm packages.
-
-You can use `slurm_user` (a hash) and `slurm_create_user` (a bool) to pre-create a Slurm user so that uids match.
+## Job Submit support
 
 To install a custom `job_submit.lua` script on Slurm controller nodes, define
 `slurm_job_submit_lua` with the path to your script in the Ansible inventory.
