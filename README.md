@@ -89,6 +89,30 @@ permissions.
 Note that this role requires root access, so enable ``become`` either globally in your playbook / on the commandline or
 just for the role like [shown below](#example-playbooks).
 
+## Topology Configuration
+
+To configure Slurm topology, define the `slurm_topology_config` variable as a
+text block containing the desired content for `topology.conf`.
+
+**Important:** If you set `slurm_topology_config`, you must also set
+`TopologyPlugin` in your `slurm_config` (e.g., `TopologyPlugin:
+topology/tree`).
+
+Example:
+```yaml
+slurm_topology_config: |
+  SwitchName=s0 Nodes=tux[0-1]
+  SwitchName=s1 Nodes=tux[2-3]
+  SwitchName=s2 Switches=s[0-1]
+
+slurm_config:
+  TopologyPlugin: "topology/tree"
+  # ... other config ...
+```
+
+The `topology.conf` file will only be deployed to controller nodes (those
+running `slurmctld`).
+
 Dependencies
 ------------
 

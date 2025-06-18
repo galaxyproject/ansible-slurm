@@ -48,3 +48,20 @@
 - name: Include job_submit.lua installation tasks
   ansible.builtin.include_tasks: job_submit_lua.yml
   when: slurm_job_submit_lua is defined
+
+- name: Fail if slurm_topology_config is set but TopologyPlugin is not defined
+  ansible.builtin.fail:
+    msg: "slurm_topology_config is set, but TopologyPlugin is not defined in slurm_config. Please set TopologyPlugin (e.g., 'topology/tree')."
+  when:
+    - slurm_topology_config is defined
+    - (slurm_config.TopologyPlugin is not defined) or (slurm_config.TopologyPlugin | length == 0)
+
+- name: Deploy topology.conf if slurm_topology_config is defined
+  ansible.builtin.copy:
+    content: "{{ slurm_topology_config }}"
+    dest: "{{ slurm_config_dir }}/topology.conf"
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - slurm_topology_config is defined
