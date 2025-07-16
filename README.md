@@ -2,6 +2,18 @@ Slurm
 =====
 
 Install and configure a Slurm cluster on RHEL/CentOS or Debian/Ubuntu servers
+To configure a custom Debian repository, define `slurm_configure_repos: true`.
+
+Then, define the APT  repositories with the URL to the GPG key.
+
+    # Example apt repository
+    slurm_apt_repository: "deb [trusted=yes] http://127.0.0.1/ubuntu/22.04/amd64/  ./"
+    # Example GPG key
+    slurm_gpg_key: 'http://127.0.0.1/ubuntu/22.04/amd64/GPG-KEY-slurm'
+     
+Define `slurm_apt_priority` to pin the priority of the repository (APT only). This is optional.
+
+    slurm_apt_priority: 900
 
 Role Variables
 --------------
@@ -23,16 +35,80 @@ Partitions and nodes go in `slurm_partitions` and `slurm_nodes`, lists of hashes
 of that partition or node.
 
 Options for the additional configuration files [acct_gather.conf](https://slurm.schedmd.com/acct_gather.conf.html),
-[cgroup.conf](https://slurm.schedmd.com/cgroup.conf.html) and [gres.conf](https://slurm.schedmd.com/gres.conf.html)
-may be specified in the `slurm_acct_gather_config`, `slurm_cgroup_config` (both of them hashes) and
-`slurm_gres_config` (list of hashes) respectively.
+[cgroup.conf](https://slurm.schedmd.com/cgroup.conf.html), [gres.conf](https://slurm.schedmd.com/gres.conf.html)
+and [job_container.conf](https://slurm.schedmd.com/job_container.conf.html) may be specified in the
+`slurm_acct_gather_config`, `slurm_cgroup_config` (both of them hashes), `slurm_gres_config` (list of hashes) and
+`slurm_job_container_config` (hashes) respectively.
 
 Set `slurm_upgrade` to true to upgrade the installed Slurm packages.
 
 You can use `slurm_user` (a hash) and `slurm_create_user` (a bool) to pre-create a Slurm user so that uids match.
 
+## Node Reboot Support
+
+The role supports automatic node rebooting through Slurm's RebootProgram
+feature. To enable this:
+
+1. Set `slurm_reboot_program: true` in your playbook
+2. Configure the reboot program in `slurm_config`:
+```yaml
+slurm_config:
+  RebootProgram: "{{ slurm_config_dir }}/reboot_program"
+```
+
+The reboot program will attempt to reboot nodes using either systemd or
+traditional init systems, depending on what's available on the node.
+
+### Pre-Reboot Script
+
+You can customize the actions that run before a node reboots by setting the
+`slurm_pre_reboot_script` variable.
+
+Example configuration:
+```yaml
+slurm_reboot_program: true
+slurm_pre_reboot_script: |
+  # Save node state before reboot
+  logger "Saving state for node"
+  # Your custom actions here
+  exit 0
+slurm_config:
+  RebootProgram: "{{ slurm_config_dir }}/reboot_program"
+```
+
+## Job Submit support
+
+To install a custom `job_submit.lua` script on Slurm controller nodes, define
+`slurm_job_submit_lua` with the path to your script in the Ansible inventory.
+The script will be copied to the Slurm configuration directory with the correct
+permissions.
+
+    # Example: job_submit.lua from inventory
+    slurm_job_submit_lua: "{{ inventory_dir }}/files/slurm/job_submit.lua"
+
 Note that this role requires root access, so enable ``become`` either globally in your playbook / on the commandline or
 just for the role like [shown below](#example-playbooks).
+
+## Topology Configuration
+
+To configure Slurm topology, define the `slurm_topology_config` variable as a
+text block containing the desired content for `topology.conf`.
+
+**Important:** If you set `slurm_topology_config`, you must also set
+`TopologyPlugin` in your `slurm_config` (e.g., `TopologyPlugin:
+topology/tree`).
+
+Example:
+```yaml
+slurm_topology_config: |
+  SwitchName=s0 Nodes=tux[0-1]
+  SwitchName=s1 Nodes=tux[2-3]
+  SwitchName=s2 Switches=s[0-1]
+
+slurm_config:
+  TopologyPlugin: "topology/tree"
+  # ... other config ...
+```
 
 Dependencies
 ------------
@@ -88,6 +164,8 @@ More extensive example:
       SelectType: "select/cons_res"
       SelectTypeParameters: "CR_Core"
       SlurmctldHost: "slurmctl"
+      # Use a list to configure master and backups Slurmctld hosts
+      # SlurmctldHost: ['slurmctl1', 'slurmctl2']
       SlurmctldLogFile: "/var/log/slurm/slurmctld.log"
       SlurmctldPidFile: "/var/run/slurmctld.pid"
       SlurmdLogFile: "/var/log/slurm/slurmd.log"

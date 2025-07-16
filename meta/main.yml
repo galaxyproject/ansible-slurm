@@ -1,11 +1,11 @@
 galaxy_info:
   role_name: slurm
-  namespace: galaxyproject
+  namespace: mila
   author: The Galaxy Project
   description: Install and manage the Slurm Workload Manager
-  company: The Galaxy Project
+  company: Mila
   license: MIT
-  min_ansible_version: 2.5
+  min_ansible_version: '2.14'
   github_branch: main
   platforms:
     - name: EL

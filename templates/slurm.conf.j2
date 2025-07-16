@@ -11,7 +11,13 @@ ControlMachine=localhost
 {% for key in __slurm_config_merged | sort %}
 {% set val = __slurm_config_merged[key] %}
 {% if val is not none and val != omit %}
+{% if key == 'SlurmctldHost' and val is iterable and val is not string and val is not mapping %}
+{% for slurmctldhost in val %}
+SlurmctldHost={{ slurmctldhost }}
+{% endfor %}
+{% else %}
 {{ key }}={{ 'YES' if val is sameas true else ('NO' if val is sameas false else val) }}
+{% endif %}
 {% endif %}
 {% endfor %}
 

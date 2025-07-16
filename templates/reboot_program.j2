@@ -1,0 +1,24 @@
+#!/bin/bash
+##
+## This file is maintained by Ansible - ALL MODIFICATIONS WILL BE REVERTED
+##
+
+# Log the reboot attempt
+logger "Slurm attempting to reboot node"
+
+# Run pre-reboot script
+{{ slurm_pre_reboot_script }}
+
+# Attempt to reboot the node
+if [ -x /usr/bin/systemctl ]; then
+    # Systemd-based systems
+    /usr/bin/systemctl reboot
+elif [ -x /sbin/shutdown ]; then
+    # Traditional init systems
+    /sbin/shutdown -r now
+else
+    logger "ERROR: No reboot command found on node $1"
+    exit 1
+fi
+
+exit 0 

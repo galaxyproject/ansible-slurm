@@ -16,9 +16,44 @@
     - name: gres.conf
       config: slurm_gres_config
       template: gres.conf.j2
+    - name: job_container.conf
+      config: slurm_job_container_config
+      template: generic.conf.j2
   loop_control:
     label: "{{ item.name }}"
   when: item.config in vars
+  notify:
+    - Reload slurmctld
+    - Reload slurmd
+
+- name: Install reboot program script
+  ansible.builtin.template:
+    src: reboot_program.j2
+    dest: "{{ slurm_config_dir }}/reboot_program"
+    mode: 0755
+    owner: root
+    group: root
+  when: slurm_reboot_program | bool
+  notify:
+    - Reload slurmctld
+    - Reload slurmd
+
+- name: Fail if slurm_topology_config is set but TopologyPlugin is not defined
+  ansible.builtin.fail:
+    msg: "slurm_topology_config is set, but TopologyPlugin is not defined in slurm_config. Please set TopologyPlugin (e.g., 'topology/tree')."
+  when:
+    - slurm_topology_config is defined
+    - (slurm_config.TopologyPlugin is not defined) or (slurm_config.TopologyPlugin | length == 0)
+
+- name: Deploy topology.conf if slurm_topology_config is defined
+  ansible.builtin.copy:
+    content: "{{ slurm_topology_config }}"
+    dest: "{{ slurm_config_dir }}/topology.conf"
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - slurm_topology_config is defined
   notify:
     - Reload slurmctld
     - Reload slurmd

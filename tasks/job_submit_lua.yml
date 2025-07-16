@@ -1,0 +1,9 @@
+---
+- name: Copy job_submit.lua file
+  ansible.builtin.copy:
+    src: "{{ slurm_job_submit_lua }}"
+    dest: "{{ slurm_config_dir }}/job_submit.lua"
+    mode: '0644'
+    owner: "{{ __slurm_user_name }}"
+    group: "{{ __slurm_group_name | default(omit) }}"
+  when: slurm_job_submit_lua is defined
