@@ -110,9 +110,6 @@ slurm_config:
   # ... other config ...
 ```
 
-The `topology.conf` file will only be deployed to controller nodes (those
-running `slurmctld`).
-
 Dependencies
 ------------
 
