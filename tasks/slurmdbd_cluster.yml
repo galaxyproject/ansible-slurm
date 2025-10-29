@@ -5,6 +5,8 @@
   ansible.builtin.shell: |
     set -o pipefail
     sacctmgr -n list cluster | awk '{print $1}'
+  args:
+    executable: /bin/bash
   become: true
   become_user: root
 
