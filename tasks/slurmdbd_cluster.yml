@@ -2,7 +2,9 @@
 
 - name: Check for existence of cluster in db.
   register: cluster_check
-  ansible.builtin.shell: "sacctmgr -n list cluster | cut -f 4 -d ' '"
+  ansible.builtin.shell: |
+    set -o pipefail
+    "sacctmgr -n list cluster | cut -f 4 -d ' '"
   become: true
   become_user: root
 
