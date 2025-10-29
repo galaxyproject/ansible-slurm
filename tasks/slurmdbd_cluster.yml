@@ -9,6 +9,7 @@
   become: true
   become_user: root
   register: cluster_check
+  changed_when: false
 
 - name: set cluster_check_boolean
   ansible.builtin.set_fact:
