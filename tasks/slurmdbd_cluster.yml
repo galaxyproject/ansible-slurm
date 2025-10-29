@@ -11,7 +11,7 @@
   register: cluster_check
   changed_when: false
 
-- name: set cluster_check_boolean
+- name: Set cluster_check_boolean
   ansible.builtin.set_fact:
       __cluster_not_setup: false
   when: cluster_check.stdout == "cluster"
