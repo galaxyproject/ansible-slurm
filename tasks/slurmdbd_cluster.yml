@@ -22,3 +22,5 @@
   when: __cluster_not_setup | bool
   notify:
     - Reload slurmdbd
+  register: cluster_creation
+  changed_when: cluster_creation.rc == 0
