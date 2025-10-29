@@ -4,7 +4,7 @@
   register: cluster_check
   ansible.builtin.shell: |
     set -o pipefail
-    "sacctmgr -n list cluster | cut -f 4 -d ' '"
+    sacctmgr -n list cluster | awk '{print $1}'
   become: true
   become_user: root
 
