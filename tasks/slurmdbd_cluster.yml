@@ -1,5 +1,4 @@
 ---
-
 - name: Check for existence of cluster in db.
   ansible.builtin.shell: |
     set -o pipefail
