@@ -13,6 +13,7 @@
 - name: DEBUG cluster_check variable
   ansible.builtin.debug:
     var: cluster_check
+    verbosity: 3
 
 - name: Set cluster_check_boolean
   ansible.builtin.set_fact:
