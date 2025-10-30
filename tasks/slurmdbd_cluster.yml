@@ -10,6 +10,10 @@
   register: cluster_check
   changed_when: false
 
+- name: DEBUG cluster_check variable
+  ansible.builtin.debug:
+    var: cluster_check
+
 - name: Set cluster_check_boolean
   ansible.builtin.set_fact:
     __cluster_not_setup: "{{ __slurm_cluster_name not in cluster_check.stdout_lines }}"
