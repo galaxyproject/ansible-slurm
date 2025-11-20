@@ -85,7 +85,7 @@ More extensive example:
       ProctrackType: "proctrack/cgroup"
       ReturnToService: 1
       SchedulerType: "sched/backfill"
-      SelectType: "select/cons_res"
+      SelectType: "select/cons_tres"
       SelectTypeParameters: "CR_Core"
       SlurmctldHost: "slurmctl"
       SlurmctldLogFile: "/var/log/slurm/slurmctld.log"
