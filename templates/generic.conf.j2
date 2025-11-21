@@ -1,6 +1,4 @@
-##
-## This file is maintained by Ansible - ALL MODIFICATIONS WILL BE REVERTED
-##
+{{ ansible_managed | comment }}
 
 {% set conf = lookup('vars', item.config) %}
 {% for key in conf | sort %}
